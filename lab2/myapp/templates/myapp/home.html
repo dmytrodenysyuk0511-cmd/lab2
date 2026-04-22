@@ -1,17 +1,31 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
-</head>
-<body>
-    <h1>{{ title }}</h1>
-    <p>{{ message }}</p>
+{% extends 'myapp/base.html' %}
 
-    <h3>Посилання на інші сторінки:</h3>
-    <ul>
-        <li><a href="{% url 'page1' %}">Перейти на сторінку 1</a></li>
-        <li><a href="{% url 'page2' %}">Перейти на сторінку 2</a></li>
-    </ul>
-</body>
-</html>
+{% block content %}
+<section class="hero">
+    <h1>Порівняння процесорів, відеокарт і компонентів</h1>
+    <p>
+        На цій сторінці зібрані матеріали з бази даних по тематиці технічних характеристик,
+        оглядів і порівнянь комплектуючих.
+    </p>
+</section>
+
+<section class="section-title">
+    <h2>Матеріали з бази даних</h2>
+</section>
+
+<div class="cards">
+    {% for post in posts %}
+        <article class="card">
+            <div class="card-category">{{ post.category.name }}</div>
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.content|truncatewords:25 }}</p>
+            <div class="card-meta">
+                <span>Створено: {{ post.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <a href="{% url 'post_detail' post.id %}" class="btn">Детальніше</a>
+        </article>
+    {% empty %}
+        <p>У цій категорії поки немає елементів.</p>
+    {% endfor %}
+</div>
+{% endblock %}

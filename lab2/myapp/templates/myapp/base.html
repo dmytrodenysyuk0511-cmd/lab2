@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/style.css' %}">
+    <script src="{% static 'myapp/js/main.js' %}" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{% url 'home' %}" class="logo">TechCompare UA</a>
+
+            <nav class="main-nav">
+                <a href="{% url 'home' %}">Головна</a>
+                {% for menu_category in categories %}
+                    <a href="{% url 'category_posts' menu_category.id %}">{{ menu_category.name }}</a>
+                {% endfor %}
+            </nav>
+
+            <form action="{% url 'home' %}" method="get" class="category-form">
+                <label for="category-select">Категорія</label>
+                <select name="category" id="category-select">
+                    <option value="">Усі</option>
+                    {% for menu_category in categories %}
+                        <option value="{{ menu_category.id }}" {% if selected_category_id == menu_category.id %}selected{% endif %}>
+                            {{ menu_category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Показати</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="site-main">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div>
+                <h3>TechCompare UA</h3>
+                <p>Сайт для перегляду та порівняння відеокарт, процесорів і технічних характеристик.</p>
+            </div>
+
+            <div>
+                <h3>Меню</h3>
+                <ul>
+                    <li><a href="{% url 'home' %}">Головна</a></li>
+                    {% for footer_category in categories %}
+                        <li><a href="{% url 'category_posts' footer_category.id %}">{{ footer_category.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
+                <h3>Інформація</h3>
+                <p>Email: techcompare@example.com</p>
+                <p>Телефон: +380 00 000 00 00</p>
+                <p>Лабораторна робота 5</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

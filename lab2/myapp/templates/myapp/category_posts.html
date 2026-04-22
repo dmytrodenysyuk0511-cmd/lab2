@@ -1,0 +1,28 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<section class="section-title">
+    <h1>{{ category.name }}</h1>
+    <p>Матеріали з вибраної категорії.</p>
+</section>
+
+<div class="page-actions">
+    <a href="{% url 'home' %}" class="btn">На головну</a>
+</div>
+
+<div class="cards">
+    {% for post in posts %}
+        <article class="card">
+            <div class="card-category">{{ post.category.name }}</div>
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.content|truncatewords:25 }}</p>
+            <div class="card-meta">
+                <span>Оновлено: {{ post.updated_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <a href="{% url 'post_detail' post.id %}" class="btn">Відкрити</a>
+        </article>
+    {% empty %}
+        <p>У цій категорії ще немає записів.</p>
+    {% endfor %}
+</div>
+{% endblock %}
