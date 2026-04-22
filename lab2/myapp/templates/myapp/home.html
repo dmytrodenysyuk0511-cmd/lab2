@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <p>{{ message }}</p>
+
+    <h3>Посилання на інші сторінки:</h3>
+    <ul>
+        <li><a href="{% url 'page1' %}">Перейти на сторінку 1</a></li>
+        <li><a href="{% url 'page2' %}">Перейти на сторінку 2</a></li>
+    </ul>
+</body>
+</html>
