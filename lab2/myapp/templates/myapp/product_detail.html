@@ -1,0 +1,60 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>{{ product.name }}</h1>
+        <p class="page-description">{{ product.short_description }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'product_category_detail' product.category.id %}" class="back-btn">До категорії</a>
+        <a href="{% url 'store_home' %}" class="back-btn">До магазину</a>
+    </div>
+</div>
+
+<section class="product-detail-grid">
+    <div class="product-detail-media">
+        {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-detail-image">
+        {% else %}
+            <div class="product-no-image large">No Image</div>
+        {% endif %}
+    </div>
+
+    <div class="product-detail-info">
+        <div class="topic-meta-top">
+            <span class="topic-category">{{ product.category.name }}</span>
+        </div>
+
+        <h2>{{ product.name }}</h2>
+        <div class="price-badge big">{{ product.price }} грн</div>
+
+        <p class="product-detail-text">{{ product.description }}</p>
+
+        {% if product.unlocks_plus %}
+            <ul class="feature-list">
+                <li>Доступ до UNIChat Plus</li>
+                <li>Своя пісня у профілі</li>
+                <li>Live photo профілю</li>
+                <li>Кастомне фото профілю</li>
+            </ul>
+        {% endif %}
+
+        <div class="product-actions">
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'buy_product' product.id %}">
+                    {% csrf_token %}
+                    {% if product.unlocks_plus %}
+                        <button type="submit" class="add-topic-btn">Купити UNIChat Plus</button>
+                    {% else %}
+                        <button type="submit" class="add-topic-btn">Купити</button>
+                    {% endif %}
+                </form>
+            {% else %}
+                <a href="{% url 'register' %}" class="add-topic-btn">Register для покупки</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

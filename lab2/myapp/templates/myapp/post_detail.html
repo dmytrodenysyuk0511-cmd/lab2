@@ -1,38 +1,67 @@
 {% extends 'myapp/base.html' %}
 
 {% block content %}
-<article class="detail-card">
-    <div class="card-category">{{ post.category.name }}</div>
-    <h1>{{ post.title }}</h1>
-
-    <div class="detail-meta">
-        <span>Створено: {{ post.created_at|date:"d.m.Y H:i" }}</span>
-        <span>Оновлено: {{ post.updated_at|date:"d.m.Y H:i" }}</span>
+<div class="forum-page-header">
+    <div>
+        <h1>{{ post.title }}</h1>
+        <p class="page-description">Тема форуму</p>
     </div>
 
-    <div class="detail-content">
+    <div class="header-actions">
+        <a href="{% url 'home' %}" class="back-btn">На головну</a>
+        <a href="{% url 'category_posts' post.category.id %}" class="back-btn">До розділу</a>
+    </div>
+</div>
+
+<article class="post-detail-card">
+    <div class="topic-meta-top">
+        <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
+            {{ post.category.name }}
+        </a>
+        <span>Автор {{ post.author_name }}</span>
+        <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+    </div>
+
+    <div class="post-detail-text">
         <p>{{ post.content }}</p>
-    </div>
-
-    <div class="page-actions">
-        <a href="{% url 'home' %}" class="btn">На головну</a>
-        <a href="{% url 'category_posts' post.category.id %}" class="btn btn-secondary">До категорії</a>
     </div>
 </article>
 
-<section class="comments-section">
-    <h2>Коментарі</h2>
+<section class="reply-box">
+    <h2>Додати відповідь</h2>
 
-    <div class="comments-list">
-        {% for comment in comments %}
-            <div class="comment-card">
-                <h3>{{ comment.author_name }}</h3>
-                <p>{{ comment.text }}</p>
+    <form method="post" class="forum-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ comment_form.author_name.id_for_label }}">Ім’я</label>
+            {{ comment_form.author_name }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ comment_form.text.id_for_label }}">Текст відповіді</label>
+            {{ comment_form.text }}
+        </div>
+
+        <button type="submit" class="add-topic-btn">Опублікувати</button>
+    </form>
+</section>
+
+<section class="comments-block">
+    <h2>Відповіді</h2>
+
+    {% for comment in comments %}
+        <div class="comment-item">
+            <div class="comment-head">
+                <strong>{{ comment.author_name }}</strong>
                 <span>{{ comment.created_at|date:"d.m.Y H:i" }}</span>
             </div>
-        {% empty %}
-            <p>Коментарів поки немає.</p>
-        {% endfor %}
-    </div>
+            <p>{{ comment.text }}</p>
+        </div>
+    {% empty %}
+        <div class="empty-box">
+            Поки що відповідей немає.
+        </div>
+    {% endfor %}
 </section>
 {% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>UNIChat Plus Store</h1>
+        <p class="page-description">Підписки та платні кастомізації профілю.</p>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-btn">На головну</a>
+</div>
+
+<section class="reply-box">
+    <h2>Категорії товарів</h2>
+
+    <div class="store-category-list">
+        {% for item in product_categories %}
+            <a href="{% url 'product_category_detail' item.id %}" class="store-category-chip">
+                {{ item.name }} ({{ item.products_total }})
+            </a>
+        {% empty %}
+            <div class="empty-box">Категорій товарів поки немає.</div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="store-grid">
+    {% for product in products %}
+        <article class="product-card">
+            <div class="product-image-wrap">
+                {% if product.image_url %}
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                    <div class="product-no-image">No Image</div>
+                {% endif %}
+            </div>
+
+            <div class="product-body">
+                <div class="topic-meta-top">
+                    <a href="{% url 'product_category_detail' product.category.id %}" class="topic-category">
+                        {{ product.category.name }}
+                    </a>
+                </div>
+
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.short_description }}</p>
+                <div class="price-badge">{{ product.price }} грн</div>
+
+                <div class="product-actions">
+                    <a href="{% url 'product_detail' product.id %}" class="open-topic-btn">Детальніше</a>
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <div class="empty-box">Товарів поки немає.</div>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -9,61 +9,54 @@
     <script src="{% static 'myapp/js/main.js' %}" defer></script>
 </head>
 <body>
-    <header class="site-header">
-        <div class="container header-inner">
-            <a href="{% url 'home' %}" class="logo">TechCompare UA</a>
+    <header class="top-header">
+        <div class="site-shell top-header-inner">
+            <div class="brand-block">
+                <a href="{% url 'home' %}" class="brand-logo">UNI<span>CHAT</span></a>
+                <div class="brand-subtitle">Форум для тем, обговорень та спілкування</div>
+            </div>
 
-            <nav class="main-nav">
-                <a href="{% url 'home' %}">Головна</a>
-                {% for menu_category in categories %}
-                    <a href="{% url 'category_posts' menu_category.id %}">{{ menu_category.name }}</a>
-                {% endfor %}
-            </nav>
+            <div class="header-links">
+                <a href="{% url 'home' %}">Форуми</a>
+                <a href="{% url 'store_home' %}">UNIChat Plus</a>
+                <a href="{% url 'profile' %}">My Profile</a>
 
-            <form action="{% url 'home' %}" method="get" class="category-form">
-                <label for="category-select">Категорія</label>
-                <select name="category" id="category-select">
-                    <option value="">Усі</option>
-                    {% for menu_category in categories %}
-                        <option value="{{ menu_category.id }}" {% if selected_category_id == menu_category.id %}selected{% endif %}>
-                            {{ menu_category.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <button type="submit">Показати</button>
-            </form>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_post' %}">Додати тему</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </div>
         </div>
     </header>
 
-    <main class="site-main">
-        <div class="container">
+    <main class="site-shell main-layout">
+        <aside class="left-sidebar">
+            <nav class="sidebar-menu">
+                <a href="{% url 'home' %}" class="sidebar-link active">Forums</a>
+                <a href="{% url 'store_home' %}" class="sidebar-link">UNIChat Plus Store</a>
+                <a href="{% url 'home' %}" class="sidebar-link">What's New</a>
+                <a href="{% url 'home' %}" class="sidebar-link">Recent Posts</a>
+                <a href="{% url 'profile' %}" class="sidebar-link">My Profile</a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="sidebar-link">Logout</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="sidebar-link">Register</a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <section class="content-area">
             {% block content %}{% endblock %}
-        </div>
+        </section>
     </main>
 
     <footer class="site-footer">
-        <div class="container footer-grid">
-            <div>
-                <h3>TechCompare UA</h3>
-                <p>Сайт для перегляду та порівняння відеокарт, процесорів і технічних характеристик.</p>
-            </div>
-
-            <div>
-                <h3>Меню</h3>
-                <ul>
-                    <li><a href="{% url 'home' %}">Головна</a></li>
-                    {% for footer_category in categories %}
-                        <li><a href="{% url 'category_posts' footer_category.id %}">{{ footer_category.name }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div>
-                <h3>Інформація</h3>
-                <p>Email: techcompare@example.com</p>
-                <p>Телефон: +380 00 000 00 00</p>
-                <p>Лабораторна робота 5</p>
-            </div>
+        <div class="site-shell footer-inner">
+            <div>UNIChat Forum</div>
+            <div>Plus subscription and profile customization</div>
         </div>
     </footer>
 </body>

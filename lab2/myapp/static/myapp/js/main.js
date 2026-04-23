@@ -1,3 +1,3 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('TechCompare UA loaded');
+    console.log('Forum style loaded');
 });

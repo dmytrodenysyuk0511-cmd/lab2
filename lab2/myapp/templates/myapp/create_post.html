@@ -1,0 +1,40 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>Створити тему</h1>
+        <p class="page-description">Заповни форму нижче, щоб додати нову тему на форум.</p>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-btn">На головну</a>
+</div>
+
+<section class="reply-box">
+    <form method="post" class="forum-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.category.id_for_label }}">Категорія</label>
+            {{ form.category }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.author_name.id_for_label }}">Ім’я автора</label>
+            {{ form.author_name }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Назва теми</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.content.id_for_label }}">Текст теми</label>
+            {{ form.content }}
+        </div>
+
+        <button type="submit" class="add-topic-btn">Створити тему</button>
+    </form>
+</section>
+{% endblock %}

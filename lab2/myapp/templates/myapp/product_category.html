@@ -1,0 +1,51 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>{{ product_category.name }}</h1>
+        <p class="page-description">
+            {% if product_category.description %}
+                {{ product_category.description }}
+            {% else %}
+                Товари цієї категорії.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'store_home' %}" class="back-btn">До магазину</a>
+        <a href="{% url 'home' %}" class="back-btn">На головну</a>
+    </div>
+</div>
+
+<section class="store-grid">
+    {% for product in products %}
+        <article class="product-card">
+            <div class="product-image-wrap">
+                {% if product.image_url %}
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                    <div class="product-no-image">No Image</div>
+                {% endif %}
+            </div>
+
+            <div class="product-body">
+                <div class="topic-meta-top">
+                    <span class="topic-category">{{ product.category.name }}</span>
+                </div>
+
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.short_description }}</p>
+                <div class="price-badge">{{ product.price }} грн</div>
+
+                <div class="product-actions">
+                    <a href="{% url 'product_detail' product.id %}" class="open-topic-btn">Детальніше</a>
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <div class="empty-box">У цій категорії поки немає товарів.</div>
+    {% endfor %}
+</section>
+{% endblock %}

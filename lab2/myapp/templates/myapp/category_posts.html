@@ -1,28 +1,72 @@
 {% extends 'myapp/base.html' %}
 
 {% block content %}
-<section class="section-title">
-    <h1>{{ category.name }}</h1>
-    <p>Матеріали з вибраної категорії.</p>
-</section>
+<div class="forum-page-header">
+    <div>
+        <h1>{{ category.name }}</h1>
+        <p class="page-description">
+            {% if category.description %}
+                {{ category.description }}
+            {% else %}
+                Тут знаходяться теми цього розділу.
+            {% endif %}
+        </p>
+    </div>
 
-<div class="page-actions">
-    <a href="{% url 'home' %}" class="btn">На головну</a>
+    <div class="header-actions">
+        <a href="{% url 'home' %}" class="back-btn">На головну</a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'create_post' %}" class="add-topic-btn">Додати тему</a>
+        {% endif %}
+    </div>
 </div>
 
-<div class="cards">
-    {% for post in posts %}
-        <article class="card">
-            <div class="card-category">{{ post.category.name }}</div>
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.content|truncatewords:25 }}</p>
-            <div class="card-meta">
-                <span>Оновлено: {{ post.updated_at|date:"d.m.Y H:i" }}</span>
+<div class="forum-section">
+    <div class="forum-section-top">
+        <div class="forum-section-title">Теми розділу</div>
+    </div>
+
+    <div class="topic-list">
+        {% for post in posts %}
+            <article class="topic-card">
+                <div class="topic-card-main">
+                    <div class="topic-avatar"></div>
+
+                    <div class="topic-body">
+                        <div class="topic-meta-top">
+                            <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
+                                {{ post.category.name }}
+                            </a>
+                            <span>Автор {{ post.author_name }}</span>
+                            <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                            <h3>
+                                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                            </h3>
+                        {% else %}
+                            <h3>{{ post.title }}</h3>
+                        {% endif %}
+
+                        <p>{{ post.content|truncatewords:24 }}</p>
+                    </div>
+                </div>
+
+                <div class="topic-card-side">
+                    <div>Відповіді: {{ post.comments_total }}</div>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'post_detail' post.id %}" class="open-topic-btn">Відкрити</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-box">
+                У цьому розділі ще немає тем.
             </div>
-            <a href="{% url 'post_detail' post.id %}" class="btn">Відкрити</a>
-        </article>
-    {% empty %}
-        <p>У цій категорії ще немає записів.</p>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

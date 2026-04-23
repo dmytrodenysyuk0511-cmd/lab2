@@ -1,0 +1,35 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>Реєстрація</h1>
+        <p class="page-description">Створи акаунт, щоб користуватися форумом.</p>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-btn">На головну</a>
+</div>
+
+<section class="reply-box">
+    <form method="post" class="forum-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Логін</label>
+            {{ form.username }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">Пароль</label>
+            {{ form.password1 }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">Повторіть пароль</label>
+            {{ form.password2 }}
+        </div>
+
+        <button type="submit" class="add-topic-btn">Зареєструватися</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>My Profile</h1>
+        <p class="page-description">Профіль користувача та кастомізація.</p>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-btn">На головну</a>
+</div>
+
+{% if user.is_authenticated %}
+    <section class="reply-box">
+        <h2>Профіль</h2>
+
+        <div class="comment-item">
+            <p><strong>Логін:</strong> {{ user.username }}</p>
+            {% if profile %}
+                <p><strong>Статус:</strong> {% if profile.is_plus %}UNIChat Plus{% else %}Без підписки{% endif %}</p>
+                {% if profile.plus_plan %}
+                    <p><strong>Тариф:</strong> {{ profile.plus_plan }}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+
+    {% if profile and profile.is_plus %}
+        <section class="reply-box">
+            <h2>Платна кастомізація профілю</h2>
+
+            <div class="profile-preview-grid">
+                <div class="preview-card">
+                    <h3>Фото профілю</h3>
+                    {% if profile.avatar_file %}
+                        <img src="{{ profile.avatar_file.url }}" alt="avatar" class="preview-image">
+                    {% elif profile.avatar_url %}
+                        <img src="{{ profile.avatar_url }}" alt="avatar" class="preview-image">
+                    {% else %}
+                        <div class="preview-empty">Фото ще не додано</div>
+                    {% endif %}
+                </div>
+
+                <div class="preview-card">
+                    <h3>Live photo</h3>
+                    {% if profile.live_photo_file %}
+                        <img src="{{ profile.live_photo_file.url }}" alt="live photo" class="preview-image">
+                    {% elif profile.live_photo_url %}
+                        <img src="{{ profile.live_photo_url }}" alt="live photo" class="preview-image">
+                    {% else %}
+                        <div class="preview-empty">Live photo ще не додано</div>
+                    {% endif %}
+                </div>
+
+                <div class="preview-card">
+                    <h3>Своя пісня</h3>
+                    {% if profile.favorite_song %}
+                        <div class="music-chip">{{ profile.favorite_song }}</div>
+                    {% else %}
+                        <div class="preview-empty">Назву пісні ще не додано</div>
+                    {% endif %}
+
+                    {% if profile.song_file %}
+                        <div style="margin-top: 12px;">
+                            <audio controls style="width: 100%;">
+                                <source src="{{ profile.song_file.url }}">
+                                Ваш браузер не підтримує аудіо.
+                            </audio>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="forum-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.avatar_file.id_for_label }}">Файл фото профілю</label>
+                    {{ form.avatar_file }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.live_photo_file.id_for_label }}">Файл live photo</label>
+                    {{ form.live_photo_file }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.song_file.id_for_label }}">Файл пісні</label>
+                    {{ form.song_file }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.favorite_song.id_for_label }}">Назва пісні</label>
+                    {{ form.favorite_song }}
+                </div>
+
+                <button type="submit" class="add-topic-btn">Зберегти кастомізацію</button>
+            </form>
+        </section>
+    {% else %}
+        <section class="reply-box">
+            <h2>UNIChat Plus</h2>
+            <div class="comment-item">
+                <p>Щоб відкрити платну кастомізацію профілю, потрібно купити підписку UNIChat Plus.</p>
+                <p>Після покупки буде доступно: своя пісня, live photo, аудіофайл пісні та кастомне фото профілю.</p>
+            </div>
+
+            {% if plus_product %}
+                <a href="{% url 'product_detail' plus_product.id %}" class="add-topic-btn">Перейти до UNIChat Plus</a>
+            {% else %}
+                <a href="{% url 'store_home' %}" class="add-topic-btn">Відкрити магазин</a>
+            {% endif %}
+        </section>
+    {% endif %}
+{% else %}
+    <section class="reply-box">
+        <h2>Гість</h2>
+
+        <div class="comment-item">
+            <p>Ти ще не зареєстрований. Спочатку створи акаунт, потім зможеш купити UNIChat Plus.</p>
+        </div>
+
+        <a href="{% url 'register' %}" class="add-topic-btn">Register</a>
+    </section>
+{% endif %}
+{% endblock %}

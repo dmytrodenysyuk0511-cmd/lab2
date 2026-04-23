@@ -1,31 +1,109 @@
 {% extends 'myapp/base.html' %}
 
 {% block content %}
-<section class="hero">
-    <h1>Порівняння процесорів, відеокарт і компонентів</h1>
-    <p>
-        На цій сторінці зібрані матеріали з бази даних по тематиці технічних характеристик,
-        оглядів і порівнянь комплектуючих.
-    </p>
-</section>
+<div class="forum-page-header">
+    <div>
+        <h1>UniChat Форум</h1>
+    </div>
 
-<section class="section-title">
-    <h2>Матеріали з бази даних</h2>
-</section>
+    {% if user.is_authenticated %}
+        <a href="{% url 'create_post' %}" class="add-topic-btn">Додати тему</a>
+    {% endif %}
+</div>
 
-<div class="cards">
-    {% for post in posts %}
-        <article class="card">
-            <div class="card-category">{{ post.category.name }}</div>
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.content|truncatewords:25 }}</p>
-            <div class="card-meta">
-                <span>Створено: {{ post.created_at|date:"d.m.Y H:i" }}</span>
+<div class="forum-section">
+    <div class="forum-section-top">
+        <div class="forum-section-title">Форуми</div>
+        <div class="forum-table-head">
+            <span>Форум</span>
+            <span>Відповіді</span>
+            <span>Переглядів</span>
+            <span>Остання публікація</span>
+        </div>
+    </div>
+
+    <div class="forum-list">
+        {% for item in categories %}
+            <div class="forum-row">
+                <div class="forum-main">
+                    <div class="forum-icon"></div>
+
+                    <div class="forum-info">
+                        <h2>
+                            <a href="{% url 'category_posts' item.id %}">{{ item.name }}</a>
+                        </h2>
+
+                        {% if item.description %}
+                            <p>{{ item.description }}</p>
+                        {% else %}
+                            <p>Розділ форуму для обговорень і тем.</p>
+                        {% endif %}
+
+                        <div class="forum-stats-mobile">
+                            Topics: {{ item.posts_total }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="forum-meta">
+                    <div>{{ item.posts_total }}</div>
+                    <div>{{ item.posts_total }}</div>
+                    <div></div>
+                </div>
             </div>
-            <a href="{% url 'post_detail' post.id %}" class="btn">Детальніше</a>
-        </article>
-    {% empty %}
-        <p>У цій категорії поки немає елементів.</p>
-    {% endfor %}
+        {% empty %}
+            <div class="empty-box">
+                Поки немає розділів. Додай категорії через адмінку.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="forum-section topics-section">
+    <div class="forum-section-top">
+        <div class="forum-section-title">Останні теми</div>
+    </div>
+
+    <div class="topic-list">
+        {% for post in posts %}
+            <article class="topic-card">
+                <div class="topic-card-main">
+                    <div class="topic-avatar"></div>
+
+                    <div class="topic-body">
+                        <div class="topic-meta-top">
+                            <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
+                                {{ post.category.name }}
+                            </a>
+                            <span>Автор {{ post.author_name }}</span>
+                            <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                            <h3>
+                                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                            </h3>
+                        {% else %}
+                            <h3>{{ post.title }}</h3>
+                        {% endif %}
+
+                        <p>{{ post.content|truncatewords:22 }}</p>
+                    </div>
+                </div>
+
+                <div class="topic-card-side">
+                    <div>Відповіді: {{ post.comments_total }}</div>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'post_detail' post.id %}" class="open-topic-btn">Відкрити</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-box">
+                Тем поки немає.
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
