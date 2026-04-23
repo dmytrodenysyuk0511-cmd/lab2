@@ -157,7 +157,9 @@ button {
 .add-topic-btn,
 .back-btn,
 .small-topic-btn,
-.open-topic-btn {
+.open-topic-btn,
+.primary-button,
+.secondary-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -172,12 +174,14 @@ button {
 
 .add-topic-btn,
 .small-topic-btn,
-.open-topic-btn {
+.open-topic-btn,
+.primary-button {
     background: #3c78ef;
     color: white;
 }
 
-.back-btn {
+.back-btn,
+.secondary-button {
     background: #eaf2fb;
     color: #4470a5;
     border: 1px solid #b8d0ea;
@@ -185,11 +189,13 @@ button {
 
 .add-topic-btn:hover,
 .small-topic-btn:hover,
-.open-topic-btn:hover {
+.open-topic-btn:hover,
+.primary-button:hover {
     background: #2e68dc;
 }
 
-.back-btn:hover {
+.back-btn:hover,
+.secondary-button:hover {
     background: #dbe9f7;
 }
 
@@ -231,14 +237,16 @@ button {
 
 .forum-row,
 .topic-card,
-.post-detail-card,
+.post-detail-box,
 .reply-box,
 .comment-item,
 .empty-box,
 .product-card,
 .preview-card,
 .product-detail-media,
-.product-detail-info {
+.product-detail-info,
+.comment-box,
+.rating-summary-box {
     background: #edf3f9;
     border: 1px solid #c9d6e4;
     border-radius: 18px;
@@ -314,7 +322,8 @@ button {
     flex-shrink: 0;
 }
 
-.topic-meta-top {
+.topic-meta-top,
+.thread-meta {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
@@ -323,22 +332,27 @@ button {
     margin-bottom: 8px;
 }
 
-.topic-category {
+.topic-category,
+.badge {
     color: #3c78ef;
     font-weight: 700;
 }
 
-.topic-body h3 {
+.topic-body h3,
+.product-body h3 {
     font-size: 26px;
     color: #3b6ca0;
     margin-bottom: 8px;
 }
 
-.topic-body h3 a:hover {
+.topic-body h3 a:hover,
+.product-body h3 a:hover {
     color: #274f7b;
 }
 
-.topic-body p {
+.topic-body p,
+.product-body p,
+.post-detail-text p {
     color: #5f7183;
 }
 
@@ -351,23 +365,15 @@ button {
     color: #58708a;
 }
 
-.post-detail-card {
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.post-detail-text p {
-    font-size: 18px;
-    color: #485a6d;
-}
-
+.post-detail-box,
 .reply-box {
     padding: 20px;
     margin-bottom: 20px;
 }
 
 .reply-box h2,
-.comments-block h2 {
+.comments-section h2,
+.page-header h1 {
     font-size: 28px;
     color: #33495f;
     margin-bottom: 14px;
@@ -400,16 +406,18 @@ button {
 }
 
 .form-group textarea {
-    min-height: 140px;
+    min-height: 120px;
     resize: vertical;
 }
 
-.comment-item {
+.comment-item,
+.comment-box,
+.rating-summary-box {
     padding: 18px 20px;
     margin-bottom: 14px;
 }
 
-.comment-head {
+.comment-top {
     display: flex;
     justify-content: space-between;
     gap: 12px;
@@ -483,17 +491,6 @@ button {
     padding: 18px;
 }
 
-.product-body h3 {
-    font-size: 24px;
-    color: #3b6ca0;
-    margin-bottom: 8px;
-}
-
-.product-body p {
-    color: #5f7183;
-    margin-bottom: 12px;
-}
-
 .price-badge {
     display: inline-block;
     padding: 8px 14px;
@@ -519,6 +516,7 @@ button {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 22px;
+    margin-bottom: 20px;
 }
 
 .product-detail-info {
@@ -597,6 +595,34 @@ button {
     font-weight: 600;
 }
 
+.cart-item-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 16px 0;
+    border-bottom: 1px solid #c9d6e4;
+}
+
+.cart-total-box {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #f8fbff;
+    border: 1px solid #bfd0e1;
+}
+
+.page-header,
+.page-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
 .site-footer {
     background: #f8fafc;
     border-top: 1px solid #b7c7d9;
@@ -637,7 +663,8 @@ button {
         font-size: 30px;
     }
 
-    .forum-page-header h1 {
+    .forum-page-header h1,
+    .page-header h1 {
         font-size: 28px;
     }
 

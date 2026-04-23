@@ -105,9 +105,7 @@
                 <p>Після покупки буде доступно: своя пісня, live photo, аудіофайл пісні та кастомне фото профілю.</p>
             </div>
 
-            {% if plus_product %}
-                <a href="{% url 'product_detail' plus_product.id %}" class="add-topic-btn">Перейти до UNIChat Plus</a>
-            {% else %}
+            {% if profile %}
                 <a href="{% url 'store_home' %}" class="add-topic-btn">Відкрити магазин</a>
             {% endif %}
         </section>

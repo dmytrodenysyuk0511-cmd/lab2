@@ -4,11 +4,34 @@
 <div class="forum-page-header">
     <div>
         <h1>UNIChat Plus Store</h1>
-        <p class="page-description">Підписки та платні кастомізації профілю.</p>
+        <p class="page-description">Підписки, кастомізація та товари.</p>
     </div>
 
-    <a href="{% url 'home' %}" class="back-btn">На головну</a>
+    <div class="header-actions">
+        <a href="{% url 'cart_view' %}" class="back-btn">Перейти в кошик</a>
+        <a href="{% url 'home' %}" class="back-btn">На головну</a>
+    </div>
 </div>
+
+<section class="reply-box">
+    <h2>Форма для розсилки інформаційних листів</h2>
+    <form method="post" action="{% url 'newsletter_subscribe' %}" class="forum-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'store_home' %}">
+
+        <div class="form-group">
+            <label for="{{ newsletter_form.name.id_for_label }}">Ім'я</label>
+            {{ newsletter_form.name }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ newsletter_form.email.id_for_label }}">Email</label>
+            {{ newsletter_form.email }}
+        </div>
+
+        <button type="submit" class="add-topic-btn">Підписатися</button>
+    </form>
+</section>
 
 <section class="reply-box">
     <h2>Категорії товарів</h2>
@@ -48,6 +71,14 @@
 
                 <div class="product-actions">
                     <a href="{% url 'product_detail' product.id %}" class="open-topic-btn">Детальніше</a>
+
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'add_to_cart' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'store_home' %}">
+                            <button type="submit" class="add-topic-btn">У кошик</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </article>

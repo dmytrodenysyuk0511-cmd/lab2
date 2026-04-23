@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment, UserProfile
+from .models import Post, Comment, UserProfile, NewsletterSubscriber, ProductRating
 
 
 class PostForm(forms.ModelForm):
@@ -20,5 +20,20 @@ class UserProfileForm(forms.ModelForm):
         fields = ["avatar_file", "live_photo_file", "song_file", "favorite_song"]
         widgets = {
             "favorite_song": forms.TextInput(attrs={"placeholder": "Введи назву пісні"}),
-            "song_file": forms.ClearableFileInput(attrs={"accept": "audio/*"}),
+        }
+
+
+class NewsletterForm(forms.ModelForm):
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ["name", "email"]
+
+
+class ProductRatingForm(forms.ModelForm):
+    class Meta:
+        model = ProductRating
+        fields = ["score", "comment"]
+        widgets = {
+            "score": forms.Select(choices=[(1, "1"), (2, "2"), (3, "3"), (4, "4"), (5, "5")]),
+            "comment": forms.Textarea(attrs={"rows": 4, "placeholder": "Напиши короткий коментар"}),
         }

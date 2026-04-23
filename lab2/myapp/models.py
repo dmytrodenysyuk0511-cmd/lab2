@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Category(models.Model):
@@ -131,3 +132,52 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = "Профіль користувача"
         verbose_name_plural = "Профілі користувачів"
+
+
+class CartItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="cart_items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="cart_items")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Кількість")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Створено")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Оновлено")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name}"
+
+    class Meta:
+        verbose_name = "Кошик"
+        verbose_name_plural = "Кошик"
+        unique_together = ("user", "product")
+
+
+class NewsletterSubscriber(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Ім'я")
+    email = models.EmailField(unique=True, verbose_name="Email")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Створено")
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = "Підписник розсилки"
+        verbose_name_plural = "Підписники розсилки"
+
+
+class ProductRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="product_ratings")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="ratings")
+    score = models.PositiveSmallIntegerField(
+        verbose_name="Оцінка",
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comment = models.TextField(blank=True, default="", verbose_name="Коментар")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Створено")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Оновлено")
+
+    def __str__(self):
+        return f"{self.product.name} - {self.score}"
+
+    class Meta:
+        verbose_name = "Оцінка товару"
+        verbose_name_plural = "Оцінки товарів"
+        unique_together = ("user", "product")

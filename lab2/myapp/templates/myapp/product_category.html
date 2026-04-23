@@ -14,8 +14,8 @@
     </div>
 
     <div class="header-actions">
+        <a href="{% url 'cart_view' %}" class="back-btn">Кошик</a>
         <a href="{% url 'store_home' %}" class="back-btn">До магазину</a>
-        <a href="{% url 'home' %}" class="back-btn">На головну</a>
     </div>
 </div>
 
@@ -41,6 +41,14 @@
 
                 <div class="product-actions">
                     <a href="{% url 'product_detail' product.id %}" class="open-topic-btn">Детальніше</a>
+
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'add_to_cart' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'product_category_detail' product_category.id %}">
+                            <button type="submit" class="add-topic-btn">У кошик</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </article>

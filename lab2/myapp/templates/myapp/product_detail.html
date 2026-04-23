@@ -8,8 +8,8 @@
     </div>
 
     <div class="header-actions">
+        <a href="{% url 'cart_view' %}" class="back-btn">Кошик</a>
         <a href="{% url 'product_category_detail' product.category.id %}" class="back-btn">До категорії</a>
-        <a href="{% url 'store_home' %}" class="back-btn">До магазину</a>
     </div>
 </div>
 
@@ -32,6 +32,17 @@
 
         <p class="product-detail-text">{{ product.description }}</p>
 
+        <div class="rating-summary-box">
+            <p><strong>Середній бал:</strong>
+                {% if average_score %}
+                    {{ average_score|floatformat:1 }} / 5
+                {% else %}
+                    Ще немає оцінок
+                {% endif %}
+            </p>
+            <p><strong>Кількість оцінок:</strong> {{ ratings_count }}</p>
+        </div>
+
         {% if product.unlocks_plus %}
             <ul class="feature-list">
                 <li>Доступ до UNIChat Plus</li>
@@ -43,6 +54,12 @@
 
         <div class="product-actions">
             {% if user.is_authenticated %}
+                <form method="post" action="{% url 'add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'product_detail' product.id %}">
+                    <button type="submit" class="add-topic-btn">Додати в кошик</button>
+                </form>
+
                 <form method="post" action="{% url 'buy_product' product.id %}">
                     {% csrf_token %}
                     {% if product.unlocks_plus %}
@@ -52,9 +69,48 @@
                     {% endif %}
                 </form>
             {% else %}
-                <a href="{% url 'register' %}" class="add-topic-btn">Register для покупки</a>
+                <a href="{% url 'register' %}" class="add-topic-btn">Register</a>
             {% endif %}
         </div>
     </div>
+</section>
+
+<section class="reply-box">
+    <h2>Форма оцінки товару</h2>
+
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'rate_product' product.id %}" class="forum-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ rating_form.score.id_for_label }}">Оцінка</label>
+                {{ rating_form.score }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ rating_form.comment.id_for_label }}">Коментар</label>
+                {{ rating_form.comment }}
+            </div>
+
+            <button type="submit" class="add-topic-btn">Зберегти оцінку</button>
+        </form>
+    {% else %}
+        <div class="empty-box">Щоб оцінити товар, потрібно зареєструватися.</div>
+    {% endif %}
+</section>
+
+<section class="reply-box">
+    <h2>Оцінки користувачів</h2>
+
+    {% for rating in ratings %}
+        <div class="comment-item">
+            <p><strong>{{ rating.user.username }}</strong> — {{ rating.score }}/5</p>
+            {% if rating.comment %}
+                <p>{{ rating.comment }}</p>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div class="empty-box">Оцінок поки немає.</div>
+    {% endfor %}
 </section>
 {% endblock %}
