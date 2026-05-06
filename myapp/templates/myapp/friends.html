@@ -1,0 +1,335 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Друзі{% endblock %}
+
+{% block content %}
+<style>
+    .friends-page {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .friends-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .friends-header h1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .friends-section {
+        background: white;
+        border-radius: 30px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        border: 2px solid #e0e7ff;
+    }
+
+    .friends-section h2 {
+        color: #667eea;
+        font-size: 28px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .friend-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+        border: 2px solid #d0d7ff;
+        border-radius: 20px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .friend-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+    }
+
+    .friend-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .friend-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 800;
+        border: 3px solid white;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .friend-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .friend-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .friend-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-chat {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-chat:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-accept {
+        background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-accept:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-reject {
+        background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-reject:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-size: 18px;
+    }
+
+    .search-box {
+        margin-bottom: 30px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e0e7ff;
+        border-radius: 25px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+</style>
+
+<div class="friends-page">
+    <div class="friends-header">
+        <h1>👥 Друзі</h1>
+        <p style="color: #667eea; font-size: 18px;">Додавай друзів та спілкуйся в особистих повідомленнях</p>
+    </div>
+
+    <!-- Пошук користувачів -->
+    <div class="friends-section">
+        <h2>🔍 Пошук користувачів</h2>
+        <form method="get" action="{% url 'friends_list' %}">
+            <div class="search-box">
+                <input
+                    type="text"
+                    name="search"
+                    class="search-input"
+                    placeholder="Введіть нік користувача..."
+                    value="{{ search_query }}"
+                    autocomplete="off"
+                >
+            </div>
+        </form>
+
+        {% if search_query %}
+            {% if search_results %}
+                <div style="margin-top: 20px;">
+                    <p style="color: #667eea; font-weight: 600; margin-bottom: 15px;">Знайдено користувачів: {{ search_results|length }}</p>
+                    {% for user in search_results %}
+                    <div class="friend-card">
+                        <div class="friend-info">
+                            <div class="friend-avatar">
+                                {% if user.forum_profile.avatar_file %}
+                                    <img src="{{ user.forum_profile.avatar_file.url }}" alt="avatar">
+                                {% else %}
+                                    {{ user.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="friend-name">{{ user.username }}</div>
+                                <div style="color: #999; font-size: 14px;">{{ user.email }}</div>
+                            </div>
+                        </div>
+                        <div class="friend-actions">
+                            {% if user.friendship_status == 'friend' %}
+                                <a href="{% url 'chat_with_friend' user.username %}" class="btn-chat">💬 Написати</a>
+                                <span style="color: #22c55e; font-weight: 600;">✅ Вже друзі</span>
+                            {% elif user.friendship_status == 'pending_sent' %}
+                                <span style="color: #f59e0b; font-weight: 600;">⏳ Запит відправлено</span>
+                            {% elif user.friendship_status == 'pending_received' %}
+                                <span style="color: #667eea; font-weight: 600;">📥 Є вхідний запит</span>
+                            {% else %}
+                                <a href="{% url 'send_friend_request' user.username %}" class="btn-chat">➕ Додати у друзі</a>
+                            {% endif %}
+                            <a href="{% url 'public_profile' user.username %}" class="btn-chat" style="background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">👤 Профіль</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+                    <p>Користувачів з ніком "{{ search_query }}" не знайдено</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Вхідні запити -->
+    {% if incoming_requests %}
+    <div class="friends-section">
+        <h2>📥 Вхідні запити ({{ incoming_requests.count }})</h2>
+        {% for request in incoming_requests %}
+        <div class="friend-card">
+            <div class="friend-info">
+                <div class="friend-avatar">
+                    {% if request.from_user.forum_profile.avatar_file %}
+                        <img src="{{ request.from_user.forum_profile.avatar_file.url }}" alt="avatar">
+                    {% else %}
+                        {{ request.from_user.username|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="friend-name">{{ request.from_user.username }}</div>
+                    <div style="color: #999; font-size: 14px;">{{ request.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+            </div>
+            <div class="friend-actions">
+                <form method="post" action="{% url 'accept_friend_request' request.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-accept">✅ Прийняти</button>
+                </form>
+                <form method="post" action="{% url 'reject_friend_request' request.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-reject">❌ Відхилити</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Вихідні запити -->
+    {% if outgoing_requests %}
+    <div class="friends-section">
+        <h2>📤 Відправлені запити ({{ outgoing_requests.count }})</h2>
+        {% for request in outgoing_requests %}
+        <div class="friend-card">
+            <div class="friend-info">
+                <div class="friend-avatar">
+                    {% if request.to_user.forum_profile.avatar_file %}
+                        <img src="{{ request.to_user.forum_profile.avatar_file.url }}" alt="avatar">
+                    {% else %}
+                        {{ request.to_user.username|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="friend-name">{{ request.to_user.username }}</div>
+                    <div style="color: #999; font-size: 14px;">Очікує підтвердження...</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Список друзів -->
+    <div class="friends-section">
+        <h2>💬 Мої друзі ({{ friends.count }})</h2>
+        {% if friends %}
+            {% for friend in friends %}
+            <div class="friend-card">
+                <div class="friend-info">
+                    <div class="friend-avatar">
+                        {% if friend.forum_profile.avatar_file %}
+                            <img src="{{ friend.forum_profile.avatar_file.url }}" alt="avatar">
+                        {% else %}
+                            {{ friend.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="friend-name">{{ friend.username }}</div>
+                        <div style="color: #999; font-size: 14px;">{{ friend.email }}</div>
+                    </div>
+                </div>
+                <div class="friend-actions">
+                    <a href="{% url 'chat_with_friend' friend.username %}" class="btn-chat">💬 Написати</a>
+                    <a href="{% url 'public_profile' friend.username %}" class="btn-chat" style="background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">👤 Профіль</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div style="font-size: 64px; margin-bottom: 20px;">😔</div>
+                <p>У тебе поки немає друзів</p>
+                <p style="font-size: 16px; color: #bbb;">Знайди користувачів на форумі та додай їх у друзі!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

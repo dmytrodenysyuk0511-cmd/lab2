@@ -1,0 +1,90 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div class="category-header-with-avatar">
+        {% if category.avatar_file %}
+            <img src="{{ category.avatar_file.url }}" alt="{{ category.name }}" class="category-page-avatar">
+        {% endif %}
+
+        <div>
+            <h1>{{ category.name }}</h1>
+
+            {% if category.description %}
+                <p class="page-description">{{ category.description }}</p>
+            {% else %}
+                <p class="page-description">Підтеми цієї основної теми.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'home' %}" class="back-btn">На головну</a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'create_post' %}?category={{ category.id }}" class="add-topic-btn">
+                Створити підтему
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<section class="forum-section">
+    <div class="topic-list">
+        {% for post in posts %}
+            <article class="topic-card">
+                <div class="topic-card-main">
+                    {% if post.avatar_file %}
+                        <img src="{{ post.avatar_file.url }}" alt="{{ post.title }}" class="topic-avatar-img">
+                    {% else %}
+                        <div class="topic-avatar">
+                            {% if post.author %}
+                                {{ post.author.username|slice:":1"|upper }}
+                            {% else %}
+                                {{ post.author_name|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="topic-body">
+                        <div class="topic-meta-top">
+                            <span>
+                                Автор:
+                                {% if post.author %}
+                                    {{ post.author.username }}
+                                {% else %}
+                                    {{ post.author_name }}
+                                {% endif %}
+                            </span>
+
+                            <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        <h3>
+                            <a href="{% url 'post_detail' post.id %}">
+                                {{ post.title }}
+                            </a>
+                        </h3>
+
+                        <p>{{ post.content|truncatechars:170 }}</p>
+                    </div>
+                </div>
+
+                <div class="topic-card-side">
+                    <span>Повідомлень: {{ post.comments_total }}</span>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'post_detail' post.id %}" class="open-topic-btn">Відкрити чат</a>
+                    {% else %}
+                        <a href="{% url 'login_view' %}" class="open-topic-btn">Увійти</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-box">
+                У цій основній темі ще немає підтем.
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

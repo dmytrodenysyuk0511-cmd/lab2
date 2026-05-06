@@ -1,0 +1,64 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>Кошик</h1>
+        <p class="page-description">Товари, які ти додав у кошик.</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'store_home' %}" class="back-btn">До магазину</a>
+        <a href="{% url 'home' %}" class="back-btn">На головну</a>
+    </div>
+</div>
+
+<section class="reply-box">
+    <h2>Форма для розсилки інформаційних листів</h2>
+    <form method="post" action="{% url 'newsletter_subscribe' %}" class="forum-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'cart_view' %}">
+
+        <div class="form-group">
+            <label for="{{ newsletter_form.name.id_for_label }}">Ім'я</label>
+            {{ newsletter_form.name }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ newsletter_form.email.id_for_label }}">Email</label>
+            {{ newsletter_form.email }}
+        </div>
+
+        <button type="submit" class="add-topic-btn">Підписатися</button>
+    </form>
+</section>
+
+<section class="reply-box">
+    <h2>Товари в кошику</h2>
+
+    {% for item in cart_items %}
+        <div class="cart-item-row">
+            <div>
+                <h3>{{ item.product.name }}</h3>
+                <p>Ціна: {{ item.product.price }} грн</p>
+                <p>Кількість: {{ item.quantity }}</p>
+            </div>
+
+            <div class="product-actions">
+                <a href="{% url 'product_detail' item.product.id %}" class="open-topic-btn">Відкрити товар</a>
+                <a href="{% url 'remove_from_cart' item.id %}" class="back-btn">Видалити</a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-box">Кошик порожній.</div>
+    {% endfor %}
+
+    <div class="cart-total-box">
+        <p><strong>Загальна сума:</strong> {{ total_price }} грн</p>
+    </div>
+
+    {% if cart_items %}
+        <a href="{% url 'checkout_cart' %}" class="add-topic-btn">Оформити кошик</a>
+    {% endif %}
+</section>
+{% endblock %}

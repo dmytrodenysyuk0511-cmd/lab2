@@ -1,0 +1,207 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="chat-page">
+
+    <div class="chat-topic-header">
+        <div class="chat-topic-title-wrap">
+            {% if post.avatar_file %}
+                <img src="{{ post.avatar_file.url }}" alt="{{ post.title }}" class="chat-topic-avatar">
+            {% endif %}
+
+            <div>
+                <div class="topic-meta-top">
+                    <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
+                        {{ post.category.name }}
+                    </a>
+
+                    <span>
+                        Автор:
+                        {% if post.author %}
+                            <a href="{% url 'public_profile' post.author.username %}" class="chat-author-link">
+                                {{ post.author.username }}
+                            </a>
+                        {% else %}
+                            {{ post.author_name }}
+                        {% endif %}
+                    </span>
+
+                    <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+
+                <h1>{{ post.title }}</h1>
+                <p>{{ post.content }}</p>
+
+                <form method="post" action="{% url 'toggle_save_post' post.id %}" class="save-topic-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                    <button type="submit" class="save-topic-btn {% if post.id in saved_post_ids %}saved-active{% endif %}">
+                        {% if post.id in saved_post_ids %}
+                            Тему збережено
+                        {% else %}
+                            Зберегти тему
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <a href="{% url 'category_posts' post.category.id %}" class="back-btn">
+            Назад до підтем
+        </a>
+    </div>
+
+    <section class="chat-box">
+        <div class="chat-messages" id="chatMessages">
+            {% for item in message_items %}
+                <div class="chat-message" id="message-{{ item.message.id }}">
+
+                    {% if item.author_profile_username %}
+                        <a href="{% url 'public_profile' item.author_profile_username %}" class="chat-avatar">
+                            {% if item.avatar_url %}
+                                <img src="{{ item.avatar_url }}" alt="avatar" class="chat-avatar-img">
+                            {% else %}
+                                {{ item.author_username|slice:":1"|upper }}
+                            {% endif %}
+                        </a>
+                    {% else %}
+                        <div class="chat-avatar">
+                            {{ item.author_username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+
+                    <div class="chat-message-body">
+                        <div class="chat-message-top">
+                            <strong>
+                                {% if item.author_profile_username %}
+                                    <a href="{% url 'public_profile' item.author_profile_username %}" class="chat-author-link">
+                                        {{ item.author_username }}
+                                    </a>
+                                {% else %}
+                                    {{ item.author_username }}
+                                {% endif %}
+                            </strong>
+
+                            <span>{{ item.message.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        {% if item.message.parent %}
+                            <a href="#message-{{ item.message.parent.id }}" class="reply-preview">
+                                <span>Відповідь на:</span>
+                                <strong>{{ item.parent_author_name }}</strong>
+                                <p>{{ item.parent_text|truncatechars:90 }}</p>
+                            </a>
+                        {% endif %}
+
+                        {% if item.message.text %}
+                            <div class="chat-text">
+                                {{ item.message.text|linebreaks }}
+                            </div>
+                        {% endif %}
+
+                        {% if item.media_url %}
+                            <div class="chat-media-box">
+                                {% if item.media_is_video %}
+                                    <video class="chat-media-video" controls>
+                                        <source src="{{ item.media_url }}">
+                                        Ваш браузер не підтримує відео.
+                                    </video>
+                                {% else %}
+                                    <img src="{{ item.media_url }}" alt="media" class="chat-media-image">
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="chat-actions-row">
+                            <form method="post" action="{% url 'toggle_save_comment' item.message.id %}" class="save-message-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                                <button type="submit" class="save-message-btn {% if item.is_saved %}saved-active{% endif %}">
+                                    {% if item.is_saved %}
+                                        Збережено
+                                    {% else %}
+                                        Зберегти
+                                    {% endif %}
+                                </button>
+                            </form>
+
+                            <button
+                                type="button"
+                                class="reply-message-btn"
+                                data-message-id="{{ item.message.id }}"
+                                data-author="{{ item.author_username }}"
+                                data-text="{{ item.message.text|truncatechars:100|escape }}"
+                            >
+                                Відповісти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-box">Повідомлень поки немає. Напиши першим.</div>
+            {% endfor %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="chat-form" id="chatForm">
+            {% csrf_token %}
+
+            <input type="hidden" name="parent_id" id="parentMessageId">
+
+            <div class="reply-target" id="replyTarget" style="display: none;">
+                <div>
+                    <strong id="replyTargetAuthor"></strong>
+                    <p id="replyTargetText"></p>
+                </div>
+
+                <button type="button" id="cancelReplyBtn">×</button>
+            </div>
+
+            <div class="chat-input-row">
+                {{ comment_form.text }}
+
+                <div class="chat-actions-buttons">
+                    <label for="{{ comment_form.media_file.id_for_label }}" class="attach-file-btn" title="Прикріпити фото або відео">
+                        📎
+                    </label>
+                    <input type="file" id="{{ comment_form.media_file.id_for_label }}" name="{{ comment_form.media_file.name }}" accept="image/*,video/*" style="display: none;">
+
+                    <button type="submit" class="send-message-btn">Надіслати</button>
+                </div>
+            </div>
+
+            <div id="filePreview" class="file-preview" style="display: none;">
+                <span id="fileName"></span>
+                <button type="button" id="removeFile" class="remove-file-btn">×</button>
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<script>
+    // Обробка вибору файлу
+    const fileInput = document.getElementById('{{ comment_form.media_file.id_for_label }}');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFile');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                fileName.textContent = this.files[0].name;
+                filePreview.style.display = 'flex';
+            }
+        });
+    }
+
+    if (removeFileBtn) {
+        removeFileBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            filePreview.style.display = 'none';
+            fileName.textContent = '';
+        });
+    }
+</script>
+{% endblock %}

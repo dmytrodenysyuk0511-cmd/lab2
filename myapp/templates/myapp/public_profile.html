@@ -1,0 +1,128 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="profile-page">
+
+    <div class="profile-header-top">
+        <div>
+            <h1 class="profile-page-title">Профіль користувача</h1>
+            <p class="profile-page-subtitle">Публічна сторінка користувача UNIChat.</p>
+        </div>
+
+        <a href="{% url 'home' %}" class="profile-home-btn">На головну</a>
+    </div>
+
+    <section class="profile-hero">
+        {% if profile.is_plus and live_photo_url %}
+            {% if live_photo_is_video %}
+                <video class="profile-cover-image" autoplay muted loop playsinline>
+                    <source src="{{ live_photo_url }}" type="video/mp4">
+                </video>
+            {% else %}
+                <img src="{{ live_photo_url }}" alt="Live background" class="profile-cover-image">
+            {% endif %}
+        {% endif %}
+
+        <div class="profile-hero-overlay"></div>
+
+        <div class="profile-hero-content">
+            <div class="profile-avatar-wrap">
+                {% if profile.avatar_file %}
+                    <img src="{{ profile.avatar_file.url }}" alt="Аватар" class="profile-avatar">
+                {% else %}
+                    <div class="profile-avatar profile-avatar-placeholder">
+                        {{ profile_user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-user-info">
+                <div class="profile-name-row">
+                    <h2 class="profile-username">{{ profile_user.username }}</h2>
+
+                    {% if profile.is_plus %}
+                        <span class="profile-badge profile-badge-plus">UNIChat Plus</span>
+                    {% else %}
+                        <span class="profile-badge profile-badge-free">Free</span>
+                    {% endif %}
+                </div>
+
+                {% if profile.is_plus and profile.plus_plan %}
+                    <p class="profile-role">План: {{ profile.plus_plan }}</p>
+                {% endif %}
+
+                <p class="profile-role">Учасник форуму UNIChat</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="profile-stats">
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">{{ posts_count }}</div>
+            <div class="profile-stat-label">Підтеми</div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">{{ comments_count }}</div>
+            <div class="profile-stat-label">Повідомлення</div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">
+                {% if profile.is_plus %}+{% else %}-{% endif %}
+            </div>
+            <div class="profile-stat-label">UNIChat Plus</div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">#</div>
+            <div class="profile-stat-label">Профіль</div>
+        </div>
+    </section>
+
+    {% if profile.is_plus and profile.song_file %}
+        <section class="profile-card">
+            <h2 class="section-title">Музика профілю</h2>
+
+            {% if profile.favorite_song %}
+                <p class="section-text">Трек: {{ profile.favorite_song }}</p>
+            {% endif %}
+
+            <audio controls class="profile-audio">
+                <source src="{{ profile.song_file.url }}">
+                Ваш браузер не підтримує аудіо.
+            </audio>
+        </section>
+    {% endif %}
+
+    <section class="profile-card">
+        <h2 class="section-title">Останні підтеми користувача</h2>
+
+        {% if recent_posts %}
+            <div class="recent-posts-list">
+                {% for post in recent_posts %}
+                    <div class="recent-post-card">
+                        <div class="topic-meta-top">
+                            <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
+                                {{ post.category.name }}
+                            </a>
+
+                            <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        <h3 class="recent-post-title">{{ post.title }}</h3>
+                        <p class="recent-post-text">{{ post.content|truncatechars:160 }}</p>
+
+                        <a href="{% url 'post_detail' post.id %}" class="recent-post-link">
+                            Відкрити чат
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-box">Цей користувач ще не створював підтем.</div>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<style>
+    .register-container {
+        max-width: 550px;
+        margin: 50px auto;
+    }
+
+    .register-card {
+        background: white;
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(118, 75, 162, 0.3);
+        border: 2px solid #f0e7ff;
+    }
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .register-header h1 {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 42px;
+        margin-bottom: 10px;
+    }
+
+    .register-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .register-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 25px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .register-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(118, 75, 162, 0.5);
+    }
+
+    .register-links {
+        text-align: center;
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .register-links a {
+        color: #764ba2;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .register-links a:hover {
+        color: #667eea;
+        transform: scale(1.05);
+    }
+
+    .benefits-box {
+        background: linear-gradient(135deg, #f0e7ff 0%, #e7f0ff 100%);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 2px solid #d0c7ff;
+    }
+
+    .benefits-box h3 {
+        color: #764ba2;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .benefits-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .benefits-list li {
+        padding: 8px 0;
+        color: #555;
+        font-size: 15px;
+    }
+
+    .benefits-list li::before {
+        content: "✨ ";
+        margin-right: 8px;
+    }
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <div class="register-icon">🎉</div>
+            <h1>Реєстрація</h1>
+            <p style="color: #764ba2;">Створи акаунт для форуму та магазину</p>
+        </div>
+
+        <div class="benefits-box">
+            <h3>🎁 Що ти отримаєш:</h3>
+            <ul class="benefits-list">
+                <li>Доступ до всіх тем форуму</li>
+                <li>Можливість створювати пости</li>
+                <li>Персональний профіль</li>
+                <li>Покупки в магазині</li>
+            </ul>
+        </div>
+
+        <form method="post" class="forum-form">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="error-box">
+                    ❌ {{ form.errors }}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">👤 Логін</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">📧 Email</label>
+                {{ form.email }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">🔑 Пароль</label>
+                {{ form.password1 }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">🔐 Повторіть пароль</label>
+                {{ form.password2 }}
+            </div>
+
+            <button type="submit" class="register-btn">🚀 Зареєструватись</button>
+        </form>
+
+        <div class="register-links">
+            <span>Вже є акаунт?</span>
+            <a href="{% url 'login_view' %}">🔐 Увійти</a>
+            <span style="color: #ccc;">|</span>
+            <a href="{% url 'home' %}">🏠 На головну</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

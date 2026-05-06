@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ site_language|default:'uk' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }}{% else %}UNIChat{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/style.css' %}">
+    <script src="{% static 'myapp/js/main.js' %}" defer></script>
+    <style>
+        /* Додаткові покращення інтерфейсу */
+        .site-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .site-logo {
+            color: white !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .site-logo span {
+            color: #ffd700 !important;
+        }
+
+        .side-menu {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        }
+
+        .side-link {
+            background: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .side-link:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .side-link::before {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            min-height: 100vh;
+        }
+
+        .content-area {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="theme-{{ site_theme|default:'light' }}">
+
+    <header class="site-header">
+        <div class="site-shell site-header-inner">
+            <a href="{% url 'home' %}" class="site-logo">UNI<span>Chat</span></a>
+            <button id="themeToggle" class="theme-toggle-btn" aria-label="Перемкнути тему">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="site-shell main-layout">
+        <aside class="side-panel">
+            <nav class="side-menu">
+                <a href="{% url 'home' %}" class="side-link">🏠 {{ ui.forums }}</a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'friends_list' %}" class="side-link">
+                        👥 Друзі {% if unread_messages_count %}<span style="background: #ff4444; color: white; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-size: 12px;">{{ unread_messages_count }}</span>{% endif %}
+                    </a>
+
+                    <a href="{% url 'saved_items' %}" class="side-link">
+                        💾 {{ ui.saved }} {% if saved_count %}<span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; margin-left: 8px; font-size: 12px;">{{ saved_count }}</span>{% endif %}
+                    </a>
+
+                    <a href="{% url 'profile' %}" class="side-link">👤 {{ ui.profile }}</a>
+                    <a href="{% url 'account_settings' %}" class="side-link">⚙️ {{ ui.settings }}</a>
+                {% else %}
+                    <a href="{% url 'login_view' %}" class="side-link">🔐 {{ ui.login }}</a>
+                    <a href="{% url 'register' %}" class="side-link">✨ {{ ui.register }}</a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <section class="content-area">
+            {% block content %}{% endblock %}
+        </section>
+    </main>
+
+</body>
+</html>

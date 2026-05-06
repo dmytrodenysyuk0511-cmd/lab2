@@ -1,0 +1,403 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Особистий кабінет{% endblock %}
+
+{% block content %}
+<style>
+    .profile-page-top h1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 48px;
+    }
+
+    .profile-back-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .profile-back-btn:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+
+    .profile-hero-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-hero-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    .profile-hero-avatar {
+        border: 5px solid white;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        transition: all 0.4s ease;
+    }
+
+    .profile-hero-avatar:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+
+    .profile-plus-badge {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #764ba2;
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+        animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5); }
+        50% { box-shadow: 0 8px 25px rgba(255, 215, 0, 0.8); }
+    }
+
+    .profile-stat-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+        border: 2px solid #667eea;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .profile-stat-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+        border-color: #764ba2;
+    }
+
+    .profile-stat-number {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 52px;
+    }
+
+    .profile-music-card,
+    .profile-custom-card,
+    .profile-history-card {
+        background: white;
+        border: 2px solid #e0e7ff;
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .profile-music-card:hover,
+    .profile-custom-card:hover,
+    .profile-history-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(102, 126, 234, 0.25);
+        border-color: #667eea;
+    }
+
+    .profile-save-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .profile-save-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .profile-list-item {
+        background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+        border: 2px solid #d0d7ff;
+        transition: all 0.3s ease;
+    }
+
+    .profile-list-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
+    }
+</style>
+
+<div class="profile-page">
+    <div class="profile-page-top">
+        <div>
+            <h1>✨ Особистий кабінет</h1>
+            <p>Твій профіль, кастомізація та історія замовлень.</p>
+        </div>
+
+        <a href="{% url 'home' %}" class="profile-back-btn">🏠 На головну</a>
+    </div>
+
+    <div class="profile-hero-card">
+        <div class="profile-hero-bg">
+            {% if user_profile.is_plus and user_profile.live_photo_file %}
+                <video autoplay muted loop playsinline class="profile-hero-video">
+                    <source src="{{ user_profile.live_photo_file.url }}" type="video/mp4">
+                </video>
+            {% endif %}
+        </div>
+
+        <div class="profile-hero-overlay"></div>
+
+        <div class="profile-hero-content">
+            <div class="profile-hero-avatar-wrap">
+                <div class="profile-hero-avatar">
+                    {% if user_profile.avatar_file %}
+                        <img src="{{ user_profile.avatar_file.url }}" alt="avatar">
+                    {% else %}
+                        <span>{{ user.username|slice:":1"|upper }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-hero-info">
+                <div class="profile-hero-name-row">
+                    <h2>{{ user.username }}</h2>
+
+                    {% if user_profile.is_plus %}
+                        <span class="profile-plus-badge">UNIChat Plus</span>
+                    {% else %}
+                        <span class="profile-free-badge">Free</span>
+                    {% endif %}
+                </div>
+
+                <div class="profile-hero-email">{{ user.email }}</div>
+                <div class="profile-hero-role">Роль: {% if user.is_superuser %}Адміністратор{% else %}Користувач{% endif %}</div>
+                <div class="profile-hero-plan">
+                    План:
+                    {% if user_profile.is_plus %}
+                        Кастомізація
+                    {% else %}
+                        Базовий
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-stats-grid">
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">{{ posts_count|default:"0" }}</div>
+            <div class="profile-stat-label">Теми</div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">{{ comments_count|default:"0" }}</div>
+            <div class="profile-stat-label">Коментарі</div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">{{ orders_count|default:"0" }}</div>
+            <div class="profile-stat-label">Замовлення</div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-number">{{ total_spent|default:"0" }}</div>
+            <div class="profile-stat-label">Всього витрачено</div>
+        </div>
+    </div>
+
+    {% if user_profile.is_plus and user_profile.song_file %}
+        <div class="profile-music-card">
+            <h3>Музика профілю</h3>
+
+            {% if user_profile.song_name %}
+                <div class="profile-music-title">{{ user_profile.song_name }}</div>
+            {% endif %}
+
+            <audio controls class="profile-audio-player">
+                <source src="{{ user_profile.song_file.url }}">
+            </audio>
+        </div>
+    {% endif %}
+
+    <div class="profile-custom-card">
+        <div class="profile-custom-header">
+            <h3>Кастомізація профілю</h3>
+            <p>Аватарка — безкоштовно. Live background і музика — тільки для UNIChat Plus.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="profile-custom-form">
+            {% csrf_token %}
+
+            <div class="profile-custom-grid">
+                <div class="profile-custom-box free-box">
+                    <div class="profile-custom-box-head">
+                        <h4>Безкоштовна кастомізація</h4>
+                        <span class="custom-box-badge free-badge-mini">FREE</span>
+                    </div>
+
+                    <div class="custom-preview-card">
+                        <div class="custom-preview-title">Фото аватару</div>
+
+                        {% if user_profile.avatar_file %}
+                            <div class="custom-file-info">
+                                <a href="{{ user_profile.avatar_file.url }}" target="_blank">
+                                    {{ user_profile.avatar_file.name }}
+                                </a>
+                            </div>
+
+                            <label class="custom-checkbox-label">
+                                <input type="checkbox" name="clear_avatar_file">
+                                Очистити
+                            </label>
+                        {% else %}
+                            <div class="custom-empty-text">Аватар ще не завантажено.</div>
+                        {% endif %}
+
+                        <label class="custom-input-label">Змінити:</label>
+                        <input type="file" name="avatar_file" class="custom-file-input">
+
+                        <p class="custom-help-text">
+                            Фото аватару доступне всім користувачам.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="profile-custom-box plus-box">
+                    <div class="profile-custom-box-head">
+                        <h4>UNIChat Plus</h4>
+                        <span class="custom-box-badge plus-badge-mini">PLUS</span>
+                    </div>
+
+                    <div class="custom-preview-card">
+                        <div class="custom-preview-title">Live background</div>
+
+                        {% if user_profile.live_photo_file %}
+                            <div class="custom-file-info">
+                                <a href="{{ user_profile.live_photo_file.url }}" target="_blank">
+                                    {{ user_profile.live_photo_file.name }}
+                                </a>
+                            </div>
+
+                            <label class="custom-checkbox-label">
+                                <input type="checkbox" name="clear_live_photo_file">
+                                Очистити
+                            </label>
+                        {% else %}
+                            <div class="custom-empty-text">Live background ще не завантажений.</div>
+                        {% endif %}
+
+                        <label class="custom-input-label">Змінити:</label>
+                        <input type="file" name="live_photo_file" class="custom-file-input" {% if not user_profile.is_plus %}disabled{% endif %}>
+
+                        <p class="custom-help-text">
+                            Підтримується mp4 або зображення для фону профілю.
+                        </p>
+                    </div>
+
+                    <div class="custom-preview-card">
+                        <div class="custom-preview-title">Назва пісні</div>
+                        <input
+                            type="text"
+                            name="song_name"
+                            class="custom-text-input"
+                            placeholder="Назва пісні або треку"
+                            value="{{ user_profile.song_name|default:'' }}"
+                            {% if not user_profile.is_plus %}disabled{% endif %}
+                        >
+                    </div>
+
+                    <div class="custom-preview-card">
+                        <div class="custom-preview-title">Файл музики</div>
+
+                        {% if user_profile.song_file %}
+                            <div class="custom-file-info">
+                                <a href="{{ user_profile.song_file.url }}" target="_blank">
+                                    {{ user_profile.song_file.name }}
+                                </a>
+                            </div>
+
+                            <label class="custom-checkbox-label">
+                                <input type="checkbox" name="clear_song_file">
+                                Очистити
+                            </label>
+                        {% else %}
+                            <div class="custom-empty-text">Музика ще не завантажена.</div>
+                        {% endif %}
+
+                        <label class="custom-input-label">Змінити:</label>
+                        <input type="file" name="song_file" class="custom-file-input" {% if not user_profile.is_plus %}disabled{% endif %}>
+
+                        {% if user_profile.is_plus %}
+                            <p class="custom-help-text plus-help">
+                                У тебе активний UNIChat Plus, тому ці функції відкриті.
+                            </p>
+                        {% else %}
+                            <p class="custom-help-text">
+                                Ці можливості відкриваються після покупки UNIChat Plus.
+                            </p>
+                            <a href="{% url 'store_home' %}" class="forum-primary-btn small-btn">
+                                Перейти в магазин
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="profile-save-btn">Зберегти профіль</button>
+        </form>
+    </div>
+
+    <div class="profile-bottom-grid">
+        <div class="profile-history-card">
+            <h3>Останні теми</h3>
+
+            {% if recent_posts %}
+                <div class="profile-list-wrap">
+                    {% for post in recent_posts %}
+                        <div class="profile-list-item">
+                            <div>
+                                <a href="{% url 'post_detail' post.id %}" class="profile-list-title">
+                                    {{ post.title }}
+                                </a>
+                                <div class="profile-list-meta">
+                                    {{ post.created_at|date:"d.m.Y H:i" }}
+                                </div>
+                            </div>
+
+                            <a href="{% url 'post_detail' post.id %}" class="forum-secondary-btn">
+                                Відкрити
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="profile-empty-box">У тебе ще немає тем.</div>
+            {% endif %}
+        </div>
+
+        <div class="profile-history-card">
+            <h3>Мої замовлення</h3>
+
+            {% if orders %}
+                <div class="profile-list-wrap">
+                    {% for order in orders %}
+                        <div class="profile-list-item">
+                            <div>
+                                <div class="profile-list-title">Замовлення #{{ order.id }}</div>
+                                <div class="profile-list-meta">
+                                    {{ order.created_at|date:"d.m.Y H:i" }}
+                                </div>
+                            </div>
+
+                            <div class="profile-order-price">
+                                {{ order.total_price|default:"0" }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="profile-empty-box">У тебе ще немає замовлень.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

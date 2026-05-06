@@ -1,0 +1,130 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="chat-page">
+
+    <div class="chat-topic-header">
+        <div class="chat-topic-title-wrap">
+            <div class="chat-avatar">
+                {% if friend.forum_profile.avatar_file %}
+                    <img src="{{ friend.forum_profile.avatar_file.url }}" alt="avatar" class="chat-avatar-img">
+                {% else %}
+                    {{ friend.username|slice:":1"|upper }}
+                {% endif %}
+            </div>
+
+            <div>
+                <div class="topic-meta-top">
+                    <span>Особистий чат з</span>
+                    <a href="{% url 'public_profile' friend.username %}" class="chat-author-link">
+                        {{ friend.username }}
+                    </a>
+                </div>
+
+                <h1>💬 Приватні повідомлення</h1>
+                <p>{{ friend.email }}</p>
+            </div>
+        </div>
+
+        <a href="{% url 'friends_list' %}" class="back-btn">
+            Назад до друзів
+        </a>
+    </div>
+
+    <section class="chat-box">
+        <div class="chat-messages" id="chatMessages">
+            {% for message in messages %}
+                <div class="chat-message">
+                    <a href="{% url 'public_profile' message.sender.username %}" class="chat-avatar">
+                        {% if message.sender.forum_profile.avatar_file %}
+                            <img src="{{ message.sender.forum_profile.avatar_file.url }}" alt="avatar" class="chat-avatar-img">
+                        {% else %}
+                            {{ message.sender.username|slice:":1"|upper }}
+                        {% endif %}
+                    </a>
+
+                    <div class="chat-message-body">
+                        <div class="chat-message-top">
+                            <strong>
+                                <a href="{% url 'public_profile' message.sender.username %}" class="chat-author-link">
+                                    {{ message.sender.username }}
+                                </a>
+                            </strong>
+
+                            <span>{{ message.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        <div class="chat-text">
+                            {{ message.text|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-box">Повідомлень поки немає. Напиши першим.</div>
+            {% endfor %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="chat-form" id="chatForm">
+            {% csrf_token %}
+
+            <div class="chat-input-row">
+                <input
+                    type="text"
+                    name="message_text"
+                    placeholder="Напишіть повідомлення..."
+                    required
+                    autocomplete="off"
+                    class="chat-input-field"
+                >
+
+                <div class="chat-actions-buttons">
+                    <label for="chatMediaFile" class="attach-file-btn" title="Прикріпити фото або відео">
+                        📎
+                    </label>
+                    <input type="file" id="chatMediaFile" name="media_file" accept="image/*,video/*" style="display: none;">
+
+                    <button type="submit" class="send-message-btn">Надіслати</button>
+                </div>
+            </div>
+
+            <div id="filePreview" class="file-preview" style="display: none;">
+                <span id="fileName"></span>
+                <button type="button" id="removeFile" class="remove-file-btn">×</button>
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<script>
+    // Автоматична прокрутка до останнього повідомлення
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Фокус на поле вводу
+    document.querySelector('.chat-input-field').focus();
+
+    // Обробка вибору файлу
+    const fileInput = document.getElementById('chatMediaFile');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFile');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                fileName.textContent = this.files[0].name;
+                filePreview.style.display = 'flex';
+            }
+        });
+    }
+
+    if (removeFileBtn) {
+        removeFileBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            filePreview.style.display = 'none';
+            fileName.textContent = '';
+        });
+    }
+</script>
+{% endblock %}

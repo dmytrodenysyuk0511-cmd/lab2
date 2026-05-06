@@ -1,0 +1,46 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="forum-page-header">
+    <div>
+        <h1>Створити підтему</h1>
+        <p class="page-description">Обери основну тему, додай назву, опис і аватарку підтеми.</p>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-btn">На головну</a>
+</div>
+
+<section class="reply-box">
+    <form method="post" enctype="multipart/form-data" class="forum-form">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="comment-item">
+                {{ form.errors }}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.category.id_for_label }}">Основна тема</label>
+            {{ form.category }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Назва підтеми</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.content.id_for_label }}">Опис підтеми</label>
+            {{ form.content }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.avatar_file.id_for_label }}">Аватарка підтеми</label>
+            {{ form.avatar_file }}
+        </div>
+
+        <button type="submit" class="add-topic-btn">Створити підтему</button>
+    </form>
+</section>
+{% endblock %}

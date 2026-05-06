@@ -1,0 +1,351 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}UNIChat Форум{% endblock %}
+
+{% block content %}
+<style>
+    .forum-home-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 30px;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .forum-home-hero::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .forum-home-badge {
+        background: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .forum-home-hero-left h1 {
+        color: white;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        font-size: 48px;
+    }
+
+    .forum-home-hero-left p {
+        color: rgba(255, 255, 255, 0.95);
+    }
+
+    .forum-primary-btn {
+        background: white;
+        color: #667eea;
+        font-weight: 800;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .forum-primary-btn:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+    }
+
+    .forum-main-card {
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        padding: 35px;
+    }
+
+    .forum-category-row {
+        background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+        border: 2px solid #d0d7ff;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .forum-category-row:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+    }
+
+    .forum-category-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .forum-category-title {
+        color: #667eea;
+        font-size: 24px;
+    }
+
+    .forum-category-title:hover {
+        color: #764ba2;
+    }
+
+    .forum-stat-number {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .forum-secondary-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+
+    .forum-secondary-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .forum-latest-row {
+        background: white;
+        border: 2px solid #e8ecff;
+        transition: all 0.3s ease;
+    }
+
+    .forum-latest-row:hover {
+        transform: translateX(10px);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
+    }
+
+    .forum-latest-avatar {
+        border: 3px solid #667eea;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .forum-latest-title {
+        color: #667eea;
+    }
+
+    .forum-latest-title:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="forum-home-page">
+    <div class="forum-home-hero">
+        <div class="forum-home-hero-left">
+            <span class="forum-home-badge">✨ UNIChat</span>
+            <h1>🎉 UNIChat Форум</h1>
+            <p>
+                Основні теми форуму та останні підтеми користувачів.
+                Тут можна створювати підтеми, спілкуватися у форматі чату
+                та переходити до обговорень.
+            </p>
+        </div>
+
+        <div class="forum-home-hero-right">
+            {% if user.is_authenticated %}
+                <a href="{% url 'create_post' %}" class="forum-primary-btn">✍️ Створити підтему</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="forum-primary-btn">🚀 Зареєструватися</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="forum-main-card">
+        <div class="forum-section-title-wrap">
+            <h2>📚 Основні теми</h2>
+            <p>Обери тему та переходь до підтем і обговорень.</p>
+        </div>
+
+        <div class="forum-table-head">
+            <div>Форум</div>
+            <div>Підтеми</div>
+            <div>Повідомлення</div>
+            <div>Дія</div>
+        </div>
+
+        <div class="forum-category-list">
+            {% for category in categories %}
+                <div class="forum-category-row">
+                    <div class="forum-category-main">
+                        <div class="forum-category-icon
+                            {% if 'android' in category.name|lower %}icon-android
+                            {% elif 'communication' in category.name|lower %}icon-communication
+                            {% elif 'game' in category.name|lower %}icon-game
+                            {% elif 'ios' in category.name|lower %}icon-ios
+                            {% elif 'linux' in category.name|lower %}icon-linux
+                            {% elif 'pc' in category.name|lower or 'xbox' in category.name|lower or 'ps' in category.name|lower %}icon-pc
+                            {% else %}icon-default{% endif %}">
+
+                            {% if 'android' in category.name|lower %}
+                                🤖
+                            {% elif 'communication' in category.name|lower %}
+                                💬
+                            {% elif 'game' in category.name|lower %}
+                                🎮
+                            {% elif 'ios' in category.name|lower %}
+                                🍎
+                            {% elif 'linux' in category.name|lower %}
+                                🐧
+                            {% elif 'pc' in category.name|lower or 'xbox' in category.name|lower or 'ps' in category.name|lower %}
+                                🖥️
+                            {% else %}
+                                📁
+                            {% endif %}
+                        </div>
+
+                        <div class="forum-category-info">
+                            <a href="{% url 'category_posts' category.id %}" class="forum-category-title">
+                                {{ category.name }}
+                            </a>
+                            <div class="forum-category-desc">
+                                {{ category.description|default:"Основна тема форуму для обговорень." }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="forum-category-stats">
+                        <div class="forum-stat-number">{{ category.posts.count|default:"0" }}</div>
+                        <div class="forum-stat-label">Підтем</div>
+                    </div>
+
+                    <div class="forum-category-stats">
+                        <div class="forum-stat-number">{{ category.total_messages|default:"0" }}</div>
+                        <div class="forum-stat-label">Повідомлень</div>
+                    </div>
+
+                    <div class="forum-category-action">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'create_post' %}?category={{ category.id }}" class="forum-secondary-btn">
+                                ➕ Нова підтема
+                            </a>
+                        {% else %}
+                            <a href="{% url 'register' %}" class="forum-secondary-btn">
+                                🔐 Реєстрація
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="forum-empty-box">
+                    Поки що немає жодної основної теми.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="forum-main-card forum-latest-card">
+        <div class="forum-section-title-wrap">
+            <h2>🔥 Останні підтеми</h2>
+            <p>Останні створені обговорення користувачів.</p>
+        </div>
+
+        <div class="forum-latest-list">
+            {% if latest_posts %}
+                {% for post in latest_posts %}
+                    <div class="forum-latest-row">
+                        <div class="forum-latest-left">
+                            <div class="forum-latest-avatar">
+                                {% if post.author.forum_profile.avatar_file %}
+                                    <img src="{{ post.author.forum_profile.avatar_file.url }}" alt="avatar">
+                                {% else %}
+                                    {{ post.author.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+
+                            <div class="forum-latest-info">
+                                <div class="forum-latest-topline">
+                                    <span class="forum-latest-category">📂 {{ post.category.name }}</span>
+                                    <span class="forum-latest-author">👤 Автор: {{ post.author.username }}</span>
+                                    <span class="forum-latest-date">🕐 {{ post.created_at|date:"d.m.Y H:i" }}</span>
+                                </div>
+
+                                <a href="{% url 'post_detail' post.id %}" class="forum-latest-title">
+                                    {{ post.title }}
+                                </a>
+
+                                <div class="forum-latest-text">
+                                    {{ post.content|truncatechars:110 }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="forum-latest-right">
+                            <div class="forum-latest-count">
+                                💬 Повідомлень: {{ post.comments.count|default:"0" }}
+                            </div>
+                            <a href="{% url 'post_detail' post.id %}" class="forum-primary-btn small-btn">
+                                💭 Відкрити чат
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="forum-empty-box">
+                        Поки що немає підтем.
+                    </div>
+                {% endfor %}
+            {% elif recent_posts %}
+                {% for post in recent_posts %}
+                    <div class="forum-latest-row">
+                        <div class="forum-latest-left">
+                            <div class="forum-latest-avatar">
+                                {% if post.author.forum_profile.avatar_file %}
+                                    <img src="{{ post.author.forum_profile.avatar_file.url }}" alt="avatar">
+                                {% else %}
+                                    {{ post.author.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+
+                            <div class="forum-latest-info">
+                                <div class="forum-latest-topline">
+                                    <span class="forum-latest-category">📂 {{ post.category.name }}</span>
+                                    <span class="forum-latest-author">👤 Автор: {{ post.author.username }}</span>
+                                    <span class="forum-latest-date">🕐 {{ post.created_at|date:"d.m.Y H:i" }}</span>
+                                </div>
+
+                                <a href="{% url 'post_detail' post.id %}" class="forum-latest-title">
+                                    {{ post.title }}
+                                </a>
+
+                                <div class="forum-latest-text">
+                                    {{ post.content|truncatechars:110 }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="forum-latest-right">
+                            <div class="forum-latest-count">
+                                💬 Повідомлень: {{ post.comments.count|default:"0" }}
+                            </div>
+                            <a href="{% url 'post_detail' post.id %}" class="forum-primary-btn small-btn">
+                                💭 Відкрити чат
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="forum-empty-box">
+                        Поки що немає підтем.
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="forum-empty-box">
+                    Поки що немає підтем.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
