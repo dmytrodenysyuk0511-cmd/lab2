@@ -1,109 +1,211 @@
 {% extends 'myapp/base.html' %}
 
+{% block title %}UNIChat Форум{% endblock %}
+
 {% block content %}
-<div class="forum-page-header">
-    <div>
-        <h1>UniChat Форум</h1>
-    </div>
+<div class="forum-home-page">
+    <div class="forum-home-hero">
+        <div class="forum-home-hero-left">
+            <span class="forum-home-badge">UNIChat</span>
+            <h1>UNIChat Форум</h1>
+            <p>
+                Основні теми форуму та останні підтеми користувачів.
+                Тут можна створювати підтеми, спілкуватися у форматі чату
+                та переходити до обговорень.
+            </p>
+        </div>
 
-    {% if user.is_authenticated %}
-        <a href="{% url 'create_post' %}" class="add-topic-btn">Додати тему</a>
-    {% endif %}
-</div>
-
-<div class="forum-section">
-    <div class="forum-section-top">
-        <div class="forum-section-title">Форуми</div>
-        <div class="forum-table-head">
-            <span>Форум</span>
-            <span>Відповіді</span>
-            <span>Переглядів</span>
-            <span>Остання публікація</span>
+        <div class="forum-home-hero-right">
+            {% if user.is_authenticated %}
+                <a href="{% url 'create_post' %}" class="forum-primary-btn">Створити підтему</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="forum-primary-btn">Зареєструватися</a>
+            {% endif %}
         </div>
     </div>
 
-    <div class="forum-list">
-        {% for item in categories %}
-            <div class="forum-row">
-                <div class="forum-main">
-                    <div class="forum-icon"></div>
+    <div class="forum-main-card">
+        <div class="forum-section-title-wrap">
+            <h2>Основні теми</h2>
+            <p>Обери тему та переходь до підтем і обговорень.</p>
+        </div>
 
-                    <div class="forum-info">
-                        <h2>
-                            <a href="{% url 'category_posts' item.id %}">{{ item.name }}</a>
-                        </h2>
+        <div class="forum-table-head">
+            <div>Форум</div>
+            <div>Підтеми</div>
+            <div>Повідомлення</div>
+            <div>Дія</div>
+        </div>
 
-                        {% if item.description %}
-                            <p>{{ item.description }}</p>
-                        {% else %}
-                            <p>Розділ форуму для обговорень і тем.</p>
-                        {% endif %}
-
-                        <div class="forum-stats-mobile">
-                            Topics: {{ item.posts_total }}
+        <div class="forum-category-list">
+            {% for category in categories %}
+                <div class="forum-category-row">
+                    <div class="forum-category-main">
+                        <div class="forum-category-icon
+                            {% if 'android' in category.name|lower %}icon-android
+                            {% elif 'communication' in category.name|lower %}icon-communication
+                            {% elif 'game' in category.name|lower %}icon-game
+                            {% elif 'ios' in category.name|lower %}icon-ios
+                            {% elif 'linux' in category.name|lower %}icon-linux
+                            {% elif 'pc' in category.name|lower or 'xbox' in category.name|lower or 'ps' in category.name|lower %}icon-pc
+                            {% else %}icon-default{% endif %}">
+                            
+                            {% if 'android' in category.name|lower %}
+                                🤖
+                            {% elif 'communication' in category.name|lower %}
+                                💬
+                            {% elif 'game' in category.name|lower %}
+                                🎮
+                            {% elif 'ios' in category.name|lower %}
+                                🍎
+                            {% elif 'linux' in category.name|lower %}
+                                🐧
+                            {% elif 'pc' in category.name|lower or 'xbox' in category.name|lower or 'ps' in category.name|lower %}
+                                🖥️
+                            {% else %}
+                                📁
+                            {% endif %}
                         </div>
-                    </div>
-                </div>
 
-                <div class="forum-meta">
-                    <div>{{ item.posts_total }}</div>
-                    <div>{{ item.posts_total }}</div>
-                    <div></div>
-                </div>
-            </div>
-        {% empty %}
-            <div class="empty-box">
-                Поки немає розділів. Додай категорії через адмінку.
-            </div>
-        {% endfor %}
-    </div>
-</div>
-
-<div class="forum-section topics-section">
-    <div class="forum-section-top">
-        <div class="forum-section-title">Останні теми</div>
-    </div>
-
-    <div class="topic-list">
-        {% for post in posts %}
-            <article class="topic-card">
-                <div class="topic-card-main">
-                    <div class="topic-avatar"></div>
-
-                    <div class="topic-body">
-                        <div class="topic-meta-top">
-                            <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
-                                {{ post.category.name }}
+                        <div class="forum-category-info">
+                            <a href="{% url 'category_posts' category.id %}" class="forum-category-title">
+                                {{ category.name }}
                             </a>
-                            <span>Автор {{ post.author_name }}</span>
-                            <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                            <div class="forum-category-desc">
+                                {{ category.description|default:"Основна тема форуму для обговорень." }}
+                            </div>
                         </div>
+                    </div>
 
+                    <div class="forum-category-stats">
+                        <div class="forum-stat-number">{{ category.posts.count|default:"0" }}</div>
+                        <div class="forum-stat-label">Підтем</div>
+                    </div>
+
+                    <div class="forum-category-stats">
+                        <div class="forum-stat-number">{{ category.total_messages|default:"0" }}</div>
+                        <div class="forum-stat-label">Повідомлень</div>
+                    </div>
+
+                    <div class="forum-category-action">
                         {% if user.is_authenticated %}
-                            <h3>
-                                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                            </h3>
+                            <a href="{% url 'create_post' %}?category={{ category.id }}" class="forum-secondary-btn">
+                                Нова підтема
+                            </a>
                         {% else %}
-                            <h3>{{ post.title }}</h3>
+                            <a href="{% url 'register' %}" class="forum-secondary-btn">
+                                Реєстрація
+                            </a>
                         {% endif %}
-
-                        <p>{{ post.content|truncatewords:22 }}</p>
                     </div>
                 </div>
-
-                <div class="topic-card-side">
-                    <div>Відповіді: {{ post.comments_total }}</div>
-
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'post_detail' post.id %}" class="open-topic-btn">Відкрити</a>
-                    {% endif %}
+            {% empty %}
+                <div class="forum-empty-box">
+                    Поки що немає жодної основної теми.
                 </div>
-            </article>
-        {% empty %}
-            <div class="empty-box">
-                Тем поки немає.
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="forum-main-card forum-latest-card">
+        <div class="forum-section-title-wrap">
+            <h2>Останні підтеми</h2>
+            <p>Останні створені обговорення користувачів.</p>
+        </div>
+
+        <div class="forum-latest-list">
+            {% if latest_posts %}
+                {% for post in latest_posts %}
+                    <div class="forum-latest-row">
+                        <div class="forum-latest-left">
+                            <div class="forum-latest-avatar">
+                                {% if post.author.userprofile.avatar_file %}
+                                    <img src="{{ post.author.userprofile.avatar_file.url }}" alt="avatar">
+                                {% else %}
+                                    {{ post.author.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+
+                            <div class="forum-latest-info">
+                                <div class="forum-latest-topline">
+                                    <span class="forum-latest-category">{{ post.category.name }}</span>
+                                    <span class="forum-latest-author">Автор: {{ post.author.username }}</span>
+                                    <span class="forum-latest-date">{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                                </div>
+
+                                <a href="{% url 'post_detail' post.id %}" class="forum-latest-title">
+                                    {{ post.title }}
+                                </a>
+
+                                <div class="forum-latest-text">
+                                    {{ post.content|truncatechars:110 }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="forum-latest-right">
+                            <div class="forum-latest-count">
+                                Повідомлень: {{ post.comments.count|default:"0" }}
+                            </div>
+                            <a href="{% url 'post_detail' post.id %}" class="forum-primary-btn small-btn">
+                                Відкрити чат
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="forum-empty-box">
+                        Поки що немає підтем.
+                    </div>
+                {% endfor %}
+            {% elif recent_posts %}
+                {% for post in recent_posts %}
+                    <div class="forum-latest-row">
+                        <div class="forum-latest-left">
+                            <div class="forum-latest-avatar">
+                                {% if post.author.userprofile.avatar_file %}
+                                    <img src="{{ post.author.userprofile.avatar_file.url }}" alt="avatar">
+                                {% else %}
+                                    {{ post.author.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+
+                            <div class="forum-latest-info">
+                                <div class="forum-latest-topline">
+                                    <span class="forum-latest-category">{{ post.category.name }}</span>
+                                    <span class="forum-latest-author">Автор: {{ post.author.username }}</span>
+                                    <span class="forum-latest-date">{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                                </div>
+
+                                <a href="{% url 'post_detail' post.id %}" class="forum-latest-title">
+                                    {{ post.title }}
+                                </a>
+
+                                <div class="forum-latest-text">
+                                    {{ post.content|truncatechars:110 }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="forum-latest-right">
+                            <div class="forum-latest-count">
+                                Повідомлень: {{ post.comments.count|default:"0" }}
+                            </div>
+                            <a href="{% url 'post_detail' post.id %}" class="forum-primary-btn small-btn">
+                                Відкрити чат
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="forum-empty-box">
+                        Поки що немає підтем.
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="forum-empty-box">
+                    Поки що немає підтем.
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

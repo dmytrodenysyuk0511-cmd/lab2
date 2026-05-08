@@ -1,0 +1,133 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="tg-settings-page">
+
+    <div class="tg-settings-header">
+        <div>
+            <h1>Налаштування</h1>
+            <p>Керування акаунтом, магазином, кошиком, темою та мовою.</p>
+        </div>
+
+        <a href="{% url 'home' %}" class="tg-header-home-btn">На головну</a>
+    </div>
+
+    <div class="tg-settings-group">
+        <div class="tg-settings-item tg-static-item">
+            <div class="tg-settings-left">
+                <span class="tg-settings-icon tg-icon-pink">★</span>
+                <div class="tg-settings-texts">
+                    <div class="tg-settings-title">UNIChat</div>
+                    <div class="tg-settings-subtitle">Основні налаштування твого форуму</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tg-settings-group">
+        <a href="{% url 'profile' %}" class="tg-settings-item">
+            <div class="tg-settings-left">
+                <span class="tg-settings-icon tg-icon-blue">👤</span>
+                <div class="tg-settings-texts">
+                    <div class="tg-settings-title">Акаунт</div>
+                    <div class="tg-settings-subtitle">Профіль, кастомізація та замовлення</div>
+                </div>
+            </div>
+            <span class="tg-settings-arrow">›</span>
+        </a>
+
+        <a href="{% url 'password_reset_request_view' %}" class="tg-settings-item">
+            <div class="tg-settings-left">
+                <span class="tg-settings-icon tg-icon-green">🔐</span>
+                <div class="tg-settings-texts">
+                    <div class="tg-settings-title">Змінити пароль</div>
+                    <div class="tg-settings-subtitle">Відновлення через email та тимчасовий код</div>
+                </div>
+            </div>
+            <span class="tg-settings-arrow">›</span>
+        </a>
+    </div>
+
+    <form method="post" class="tg-settings-form">
+        {% csrf_token %}
+
+        <div class="tg-settings-group">
+            <div class="tg-settings-item tg-settings-select-item">
+                <div class="tg-settings-left">
+                    <span class="tg-settings-icon tg-icon-orange">🎨</span>
+                    <div class="tg-settings-texts">
+                        <div class="tg-settings-title">Тема</div>
+                        <div class="tg-settings-subtitle">Світла або темна тема сайту</div>
+                    </div>
+                </div>
+
+                <div class="tg-settings-right">
+                    <select name="theme" class="tg-settings-select">
+                        <option value="light" {% if selected_theme == 'light' %}selected{% endif %}>Світла</option>
+                        <option value="dark" {% if selected_theme == 'dark' %}selected{% endif %}>Темна</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tg-settings-item tg-settings-select-item">
+                <div class="tg-settings-left">
+                    <span class="tg-settings-icon tg-icon-purple">🌐</span>
+                    <div class="tg-settings-texts">
+                        <div class="tg-settings-title">Мова</div>
+                        <div class="tg-settings-subtitle">Українська або English</div>
+                    </div>
+                </div>
+
+                <div class="tg-settings-right">
+                    <select name="language" class="tg-settings-select" data-auto-submit>
+                        <option value="uk" {% if selected_language == 'uk' %}selected{% endif %}>Українська</option>
+                        <option value="en" {% if selected_language == 'en' %}selected{% endif %}>English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="tg-settings-save-wrap">
+            <button type="submit" class="tg-settings-save-btn">Зберегти налаштування</button>
+        </div>
+    </form>
+
+    <div class="tg-settings-group">
+        <a href="{% url 'store_home' %}" class="tg-settings-item">
+            <div class="tg-settings-left">
+                <span class="tg-settings-icon tg-icon-yellow">🛍</span>
+                <div class="tg-settings-texts">
+                    <div class="tg-settings-title">Магазин</div>
+                    <div class="tg-settings-subtitle">UNIChat Plus, кастомізація та покупки</div>
+                </div>
+            </div>
+            <span class="tg-settings-arrow">›</span>
+        </a>
+
+        <a href="{% url 'cart_view' %}" class="tg-settings-item">
+            <div class="tg-settings-left">
+                <span class="tg-settings-icon tg-icon-cyan">🛒</span>
+                <div class="tg-settings-texts">
+                    <div class="tg-settings-title">Кошик</div>
+                    <div class="tg-settings-subtitle">Переглянути додані товари</div>
+                </div>
+            </div>
+            <div class="tg-settings-right-label">({{ cart_count }})</div>
+        </a>
+    </div>
+
+    <div class="tg-settings-group">
+        <a href="{% url 'logout' %}" class="tg-settings-item tg-logout-item">
+            <div class="tg-settings-left">
+                <span class="tg-settings-icon tg-icon-red">↪</span>
+                <div class="tg-settings-texts">
+                    <div class="tg-settings-title">Вийти</div>
+                    <div class="tg-settings-subtitle">Вийти з акаунту UNIChat</div>
+                </div>
+            </div>
+            <span class="tg-settings-arrow">›</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}

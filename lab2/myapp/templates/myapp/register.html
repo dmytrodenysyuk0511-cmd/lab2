@@ -3,8 +3,8 @@
 {% block content %}
 <div class="forum-page-header">
     <div>
-        <h1>Реєстрація</h1>
-        <p class="page-description">Створи акаунт, щоб користуватися форумом.</p>
+        <h1>Зареєструватись</h1>
+        <p class="page-description">Створи акаунт для форуму та магазину.</p>
     </div>
 
     <a href="{% url 'home' %}" class="back-btn">На головну</a>
@@ -14,9 +14,20 @@
     <form method="post" class="forum-form">
         {% csrf_token %}
 
+        {% if form.errors %}
+            <div class="comment-item">
+                {{ form.errors }}
+            </div>
+        {% endif %}
+
         <div class="form-group">
             <label for="{{ form.username.id_for_label }}">Логін</label>
             {{ form.username }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
         </div>
 
         <div class="form-group">
@@ -29,7 +40,7 @@
             {{ form.password2 }}
         </div>
 
-        <button type="submit" class="add-topic-btn">Зареєструватися</button>
+        <button type="submit" class="add-topic-btn">Зареєструватись</button>
     </form>
 </section>
 {% endblock %}

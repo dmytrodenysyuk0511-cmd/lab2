@@ -1,0 +1,108 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="saved-page">
+
+    <div class="saved-page-header">
+        <div>
+            <h1>Збережене</h1>
+            <p>Тут зберігаються твої підтеми та повідомлення.</p>
+        </div>
+
+        <a href="{% url 'home' %}" class="profile-back-btn">На головну</a>
+    </div>
+
+    <section class="saved-section">
+        <div class="saved-section-head">
+            <h2>Збережені підтеми</h2>
+            <p>Теми, які ти додав у збережене.</p>
+        </div>
+
+        <div class="saved-list">
+            {% for item in saved_posts %}
+                <article class="saved-card">
+                    <div class="saved-card-icon saved-topic-icon">★</div>
+
+                    <div class="saved-card-content">
+                        <div class="saved-meta">
+                            <span>{{ item.post.category.name }}</span>
+                            <span>{{ item.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        <a href="{% url 'post_detail' item.post.id %}" class="saved-title">
+                            {{ item.post.title }}
+                        </a>
+
+                        <p>{{ item.post.content|truncatechars:150 }}</p>
+                    </div>
+
+                    <div class="saved-actions">
+                        <a href="{% url 'post_detail' item.post.id %}" class="forum-primary-btn small-btn">
+                            Відкрити
+                        </a>
+
+                        <form method="post" action="{% url 'toggle_save_post' item.post.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'saved_items' %}">
+                            <button type="submit" class="saved-remove-btn">Прибрати</button>
+                        </form>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="forum-empty-box">
+                    Ти ще не зберіг жодної підтеми.
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="saved-section">
+        <div class="saved-section-head">
+            <h2>Збережені повідомлення</h2>
+            <p>Окремі повідомлення з чатів, які ти зберіг.</p>
+        </div>
+
+        <div class="saved-list">
+            {% for item in saved_comments %}
+                <article class="saved-card">
+                    <div class="saved-card-icon saved-message-icon">💬</div>
+
+                    <div class="saved-card-content">
+                        <div class="saved-meta">
+                            <span>{{ item.comment.post.title }}</span>
+                            <span>{{ item.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        <a href="{% url 'post_detail' item.comment.post.id %}#message-{{ item.comment.id }}" class="saved-title">
+                            Повідомлення від {{ item.comment.author_name }}
+                        </a>
+
+                        <p>{{ item.comment.text|truncatechars:180 }}</p>
+
+                        {% if item.comment.media_file %}
+                            <div class="saved-media-label">Є прикріплений файл</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="saved-actions">
+                        <a href="{% url 'post_detail' item.comment.post.id %}#message-{{ item.comment.id }}" class="forum-primary-btn small-btn">
+                            Відкрити
+                        </a>
+
+                        <form method="post" action="{% url 'toggle_save_comment' item.comment.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'saved_items' %}">
+                            <button type="submit" class="saved-remove-btn">Прибрати</button>
+                        </form>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="forum-empty-box">
+                    Ти ще не зберіг жодного повідомлення.
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+{% endblock %}

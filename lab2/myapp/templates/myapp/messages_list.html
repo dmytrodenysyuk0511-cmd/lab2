@@ -1,0 +1,51 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="messages-page">
+    <div class="messages-page-header">
+        <div>
+            <h1>Повідомлення</h1>
+            <p>Ваші приватні діалоги з друзями</p>
+        </div>
+        <a href="{% url 'friends_list' %}" class="back-btn">До друзів</a>
+    </div>
+
+    <div class="messages-section">
+        <div class="conversations-list">
+            {% for conv in conversations %}
+                <a href="{% url 'conversation' conv.user.username %}" class="conversation-card">
+                    <div class="conversation-avatar">
+                        {% if conv.user.forum_profile.avatar_file %}
+                            <img src="{{ conv.user.forum_profile.avatar_file.url }}" alt="avatar" class="conversation-avatar-img">
+                        {% else %}
+                            <span class="conversation-avatar-placeholder">{{ conv.user.username|slice:":1"|upper }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="conversation-info">
+                        <div class="conversation-top">
+                            <span class="conversation-username">{{ conv.user.username }}</span>
+                            <span class="conversation-time">{{ conv.last_message.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        <div class="conversation-preview">
+                            {% if conv.last_message.sender == user %}
+                                <span class="conversation-you">Ви: </span>
+                            {% endif %}
+                            {{ conv.last_message.text|truncatechars:60 }}
+                        </div>
+                    </div>
+
+                    {% if conv.unread_count > 0 %}
+                        <div class="conversation-unread">{{ conv.unread_count }}</div>
+                    {% endif %}
+                </a>
+            {% empty %}
+                <div class="messages-empty-box">
+                    У вас поки немає діалогів. Перейдіть до списку друзів та почніть спілкування!
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

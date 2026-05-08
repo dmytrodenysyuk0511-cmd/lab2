@@ -1,67 +1,186 @@
 {% extends 'myapp/base.html' %}
 
 {% block content %}
-<div class="forum-page-header">
-    <div>
-        <h1>{{ post.title }}</h1>
-        <p class="page-description">Тема форуму</p>
-    </div>
+<div class="chat-page">
 
-    <div class="header-actions">
-        <a href="{% url 'home' %}" class="back-btn">На головну</a>
-        <a href="{% url 'category_posts' post.category.id %}" class="back-btn">До розділу</a>
-    </div>
-</div>
+    <div class="chat-topic-header chat-room-header">
+        <div class="chat-topic-title-wrap">
+            {% if post.avatar_file %}
+                <img src="{{ post.avatar_file.url }}" alt="{{ post.title }}" class="chat-topic-avatar">
+            {% else %}
+                <div class="chat-topic-avatar chat-topic-avatar-placeholder">
+                    {{ post.title|slice:":1"|upper }}
+                </div>
+            {% endif %}
 
-<article class="post-detail-card">
-    <div class="topic-meta-top">
-        <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
-            {{ post.category.name }}
-        </a>
-        <span>Автор {{ post.author_name }}</span>
-        <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
-    </div>
+            <div>
+                <div class="topic-meta-top">
+                    <a href="{% url 'category_posts' post.category.id %}" class="topic-category">
+                        {{ post.category.name }}
+                    </a>
 
-    <div class="post-detail-text">
-        <p>{{ post.content }}</p>
-    </div>
-</article>
+                    <span>
+                        Автор:
+                        {% if post.author %}
+                            <a href="{% url 'public_profile' post.author.username %}" class="chat-author-link">
+                                {{ post.author.username }}
+                            </a>
+                        {% else %}
+                            {{ post.author_name }}
+                        {% endif %}
+                    </span>
 
-<section class="reply-box">
-    <h2>Додати відповідь</h2>
+                    <span>{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
 
-    <form method="post" class="forum-form">
-        {% csrf_token %}
+                <h1>{{ post.title }}</h1>
+                <p>{{ post.content }}</p>
 
-        <div class="form-group">
-            <label for="{{ comment_form.author_name.id_for_label }}">Ім’я</label>
-            {{ comment_form.author_name }}
-        </div>
+                <form method="post" action="{% url 'toggle_save_post' post.id %}" class="save-topic-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
 
-        <div class="form-group">
-            <label for="{{ comment_form.text.id_for_label }}">Текст відповіді</label>
-            {{ comment_form.text }}
-        </div>
-
-        <button type="submit" class="add-topic-btn">Опублікувати</button>
-    </form>
-</section>
-
-<section class="comments-block">
-    <h2>Відповіді</h2>
-
-    {% for comment in comments %}
-        <div class="comment-item">
-            <div class="comment-head">
-                <strong>{{ comment.author_name }}</strong>
-                <span>{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                    <button type="submit" class="save-topic-btn {% if post.id in saved_post_ids %}saved-active{% endif %}">
+                        {% if post.id in saved_post_ids %}
+                            Збережено
+                        {% else %}
+                            Зберегти тему
+                        {% endif %}
+                    </button>
+                </form>
             </div>
-            <p>{{ comment.text }}</p>
         </div>
-    {% empty %}
-        <div class="empty-box">
-            Поки що відповідей немає.
+
+        <a href="{% url 'category_posts' post.category.id %}" class="back-btn">
+            Назад до підтем
+        </a>
+    </div>
+
+    <section class="chat-box chat-room-box">
+        <div class="chat-messages" id="chatMessages">
+            {% for item in message_items %}
+                <div class="chat-message {% if item.is_own %}chat-message-own{% endif %}" id="message-{{ item.message.id }}">
+
+                    {% if item.author_profile_username %}
+                        <a href="{% url 'public_profile' item.author_profile_username %}" class="chat-avatar">
+                            {% if item.avatar_url %}
+                                <img src="{{ item.avatar_url }}" alt="avatar" class="chat-avatar-img">
+                            {% else %}
+                                {{ item.author_username|slice:":1"|upper }}
+                            {% endif %}
+                        </a>
+                    {% else %}
+                        <div class="chat-avatar">
+                            {{ item.author_username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+
+                    <div class="chat-message-body">
+                        <div class="chat-message-top">
+                            <strong>
+                                {% if item.author_profile_username %}
+                                    <a href="{% url 'public_profile' item.author_profile_username %}" class="chat-author-link">
+                                        {{ item.author_username }}
+                                    </a>
+                                {% else %}
+                                    {{ item.author_username }}
+                                {% endif %}
+                            </strong>
+
+                            <span>{{ item.message.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        {% if item.message.parent %}
+                            <a href="#message-{{ item.message.parent.id }}" class="reply-preview">
+                                <span>Відповідь на:</span>
+                                <strong>{{ item.parent_author_name }}</strong>
+                                <p>{{ item.parent_text|truncatechars:90 }}</p>
+                            </a>
+                        {% endif %}
+
+                        {% if item.message.text %}
+                            <div class="chat-text">
+                                {{ item.message.text|linebreaks }}
+                            </div>
+                        {% endif %}
+
+                        {% if item.media_url %}
+                            <div class="chat-media-box">
+                                {% if item.media_is_video %}
+                                    <video class="chat-media-video" controls>
+                                        <source src="{{ item.media_url }}">
+                                        Ваш браузер не підтримує відео.
+                                    </video>
+                                {% else %}
+                                    <img src="{{ item.media_url }}" alt="media" class="chat-media-image">
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="chat-actions-row">
+                            <form method="post" action="{% url 'toggle_save_comment' item.message.id %}" class="save-message-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                                <button type="submit" class="save-message-btn {% if item.is_saved %}saved-active{% endif %}">
+                                    {% if item.is_saved %}
+                                        Збережено
+                                    {% else %}
+                                        Зберегти
+                                    {% endif %}
+                                </button>
+                            </form>
+
+                            <button
+                                type="button"
+                                class="reply-message-btn"
+                                data-message-id="{{ item.message.id }}"
+                                data-author="{{ item.author_username }}"
+                                data-text="{{ item.message.text|truncatechars:100|escape }}"
+                            >
+                                Відповісти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-box chat-empty-state">Повідомлень поки немає. Напиши першим.</div>
+            {% endfor %}
         </div>
-    {% endfor %}
-</section>
+
+        <form method="post" enctype="multipart/form-data" class="chat-form telegram-composer" id="chatForm">
+            {% csrf_token %}
+
+            <input type="hidden" name="parent_id" id="parentMessageId">
+
+            <div class="reply-target" id="replyTarget" style="display: none;">
+                <div>
+                    <strong id="replyTargetAuthor"></strong>
+                    <p id="replyTargetText"></p>
+                </div>
+
+                <button type="button" id="cancelReplyBtn" aria-label="Скасувати відповідь">×</button>
+            </div>
+
+            <div class="attachment-preview" data-attachment-preview hidden>
+                <span class="attachment-file-name" data-attachment-name></span>
+                <button type="button" class="attachment-clear-btn" data-attachment-clear aria-label="Прибрати файл">×</button>
+            </div>
+
+            <div class="composer-row">
+                <label class="attachment-button" for="{{ comment_form.media_file.id_for_label }}" title="Прикріпити фото або відео" aria-label="Прикріпити фото або відео">
+                    <span aria-hidden="true">📎</span>
+                </label>
+                {{ comment_form.media_file }}
+
+                <div class="composer-input-wrap">
+                    {{ comment_form.text }}
+                </div>
+
+                <button type="submit" class="send-message-btn composer-send-btn">Надіслати</button>
+            </div>
+        </form>
+    </section>
+
+</div>
 {% endblock %}

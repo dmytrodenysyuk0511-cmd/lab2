@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run UNIChat Django 8000",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "runserver",
+                "127.0.0.1:8000"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/lab2"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

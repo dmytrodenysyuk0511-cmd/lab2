@@ -1,0 +1,138 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="friends-page">
+    <div class="friends-page-header">
+        <div>
+            <h1>Друзі</h1>
+            <p>Керуйте своїми друзями та запитами на дружбу</p>
+        </div>
+        <a href="{% url 'search_users' %}" class="primary-button">Знайти друзів</a>
+    </div>
+
+    {% if pending_requests %}
+    <div class="friends-section">
+        <div class="friends-section-head">
+            <h2>Запити на дружбу</h2>
+            <p>Користувачі, які хочуть додати вас у друзі</p>
+        </div>
+
+        <div class="friends-list">
+            {% for request in pending_requests %}
+                <div class="friend-card">
+                    <div class="friend-card-left">
+                        <a href="{% url 'public_profile' request.from_user.username %}" class="friend-avatar">
+                            {% if request.from_user.forum_profile.avatar_file %}
+                                <img src="{{ request.from_user.forum_profile.avatar_file.url }}" alt="avatar" class="friend-avatar-img">
+                            {% else %}
+                                <span class="friend-avatar-placeholder">{{ request.from_user.username|slice:":1"|upper }}</span>
+                            {% endif %}
+                        </a>
+
+                        <div class="friend-info">
+                            <a href="{% url 'public_profile' request.from_user.username %}" class="friend-name">
+                                {{ request.from_user.username }}
+                            </a>
+                            <div class="friend-meta">
+                                {{ request.from_user.email }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="friend-actions">
+                        <form method="post" action="{% url 'accept_friend_request' request.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="friend-accept-btn">Прийняти</button>
+                        </form>
+
+                        <form method="post" action="{% url 'reject_friend_request' request.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="friend-reject-btn">Відхилити</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if sent_requests %}
+    <div class="friends-section">
+        <div class="friends-section-head">
+            <h2>Відправлені запити</h2>
+            <p>Очікують підтвердження</p>
+        </div>
+
+        <div class="friends-list">
+            {% for request in sent_requests %}
+                <div class="friend-card">
+                    <div class="friend-card-left">
+                        <a href="{% url 'public_profile' request.to_user.username %}" class="friend-avatar">
+                            {% if request.to_user.forum_profile.avatar_file %}
+                                <img src="{{ request.to_user.forum_profile.avatar_file.url }}" alt="avatar" class="friend-avatar-img">
+                            {% else %}
+                                <span class="friend-avatar-placeholder">{{ request.to_user.username|slice:":1"|upper }}</span>
+                            {% endif %}
+                        </a>
+
+                        <div class="friend-info">
+                            <a href="{% url 'public_profile' request.to_user.username %}" class="friend-name">
+                                {{ request.to_user.username }}
+                            </a>
+                            <div class="friend-meta">
+                                Очікує підтвердження
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="friends-section">
+        <div class="friends-section-head">
+            <h2>Мої друзі</h2>
+            <p>Список ваших друзів</p>
+        </div>
+
+        <div class="friends-list">
+            {% for friend in friend_users %}
+                <div class="friend-card">
+                    <div class="friend-card-left">
+                        <a href="{% url 'public_profile' friend.username %}" class="friend-avatar">
+                            {% if friend.forum_profile.avatar_file %}
+                                <img src="{{ friend.forum_profile.avatar_file.url }}" alt="avatar" class="friend-avatar-img">
+                            {% else %}
+                                <span class="friend-avatar-placeholder">{{ friend.username|slice:":1"|upper }}</span>
+                            {% endif %}
+                        </a>
+
+                        <div class="friend-info">
+                            <a href="{% url 'public_profile' friend.username %}" class="friend-name">
+                                {{ friend.username }}
+                            </a>
+                            <div class="friend-meta">
+                                {{ friend.email }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="friend-actions">
+                        <a href="{% url 'conversation' friend.username %}" class="friend-message-btn">Написати</a>
+
+                        <form method="post" action="{% url 'remove_friend' friend.username %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="friend-remove-btn" onclick="return confirm('Видалити з друзів?')">Видалити</button>
+                        </form>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="friends-empty-box">
+                    У вас поки немає друзів. Знайдіть користувачів у форумі та додайте їх у друзі!
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

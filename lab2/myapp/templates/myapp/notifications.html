@@ -1,0 +1,69 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="notifications-page">
+    <div class="notifications-page-header">
+        <div>
+            <h1>Сповіщення</h1>
+            <p>Відповіді на ваші повідомлення у форумах</p>
+        </div>
+    </div>
+
+    <div class="notifications-section">
+        <div class="notifications-list">
+            {% for notification in notifications %}
+                <div class="notification-card {% if not notification.is_read %}notification-unread{% endif %}">
+                    <div class="notification-icon">
+                        {% if notification.notification_type == 'reply' %}
+                            💬
+                        {% elif notification.notification_type == 'mention' %}
+                            @
+                        {% elif notification.notification_type == 'friend_request' %}
+                            👥
+                        {% endif %}
+                    </div>
+
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            {% if notification.from_user %}
+                                <a href="{% url 'public_profile' notification.from_user.username %}" class="notification-user">
+                                    {{ notification.from_user.username }}
+                                </a>
+                            {% else %}
+                                <span class="notification-user">Користувач</span>
+                            {% endif %}
+
+                            {% if notification.notification_type == 'reply' %}
+                                відповів на ваше повідомлення
+                            {% elif notification.notification_type == 'mention' %}
+                                згадав вас
+                            {% elif notification.notification_type == 'friend_request' %}
+                                надіслав запит на дружбу
+                            {% endif %}
+                        </div>
+
+                        {% if notification.comment %}
+                            <div class="notification-text">
+                                {{ notification.comment.text|truncatechars:120 }}
+                            </div>
+
+                            <div class="notification-meta">
+                                <span>У темі: <a href="{% url 'post_detail' notification.comment.post.id %}" class="notification-link">{{ notification.comment.post.title }}</a></span>
+                                <span>{{ notification.created_at|date:"d.m.Y H:i" }}</span>
+                            </div>
+
+                            <a href="{% url 'post_detail' notification.comment.post.id %}#message-{{ notification.comment.id }}" class="notification-view-btn">
+                                Переглянути
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="notifications-empty-box">
+                    У вас поки немає сповіщень. Коли хтось відповість на ваше повідомлення, ви побачите це тут!
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

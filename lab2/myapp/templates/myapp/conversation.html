@@ -1,0 +1,95 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="conversation-page">
+    <div class="conversation-header chat-room-header">
+        <div class="conversation-header-left">
+            <a href="{% url 'public_profile' other_user.username %}" class="conversation-header-avatar">
+                {% if other_user.forum_profile.avatar_file %}
+                    <img src="{{ other_user.forum_profile.avatar_file.url }}" alt="avatar" class="conversation-header-avatar-img">
+                {% else %}
+                    <span class="conversation-header-avatar-placeholder">{{ other_user.username|slice:":1"|upper }}</span>
+                {% endif %}
+            </a>
+
+            <div>
+                <span class="chat-room-kicker">Приватний діалог</span>
+                <h1>{{ other_user.username }}</h1>
+                <p>Особисте листування та медіа між друзями.</p>
+            </div>
+        </div>
+
+        <a href="{% url 'messages_list' %}" class="back-btn">До повідомлень</a>
+    </div>
+
+    <div class="conversation-box chat-room-box">
+        <div class="conversation-messages" id="conversationMessages">
+            {% for item in message_items %}
+                <div class="conversation-message {% if item.message.sender == user %}conversation-message-own{% endif %}">
+                    <a href="{% url 'public_profile' item.message.sender.username %}" class="conversation-msg-avatar">
+                        {% if item.avatar_url %}
+                            <img src="{{ item.avatar_url }}" alt="avatar" class="conversation-msg-avatar-img">
+                        {% else %}
+                            {{ item.message.sender.username|slice:":1"|upper }}
+                        {% endif %}
+                    </a>
+
+                    <div class="conversation-message-body">
+                        <div class="conversation-message-top">
+                            <strong>
+                                <a href="{% url 'public_profile' item.message.sender.username %}" class="conversation-author-link">
+                                    {{ item.message.sender.username }}
+                                </a>
+                            </strong>
+                            <span>{{ item.message.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        {% if item.message.text %}
+                            <div class="conversation-text">
+                                {{ item.message.text|linebreaks }}
+                            </div>
+                        {% endif %}
+
+                        {% if item.media_url %}
+                            <div class="conversation-media-box">
+                                {% if item.media_is_video %}
+                                    <video class="conversation-media-video" controls>
+                                        <source src="{{ item.media_url }}">
+                                        Ваш браузер не підтримує відео.
+                                    </video>
+                                {% else %}
+                                    <img src="{{ item.media_url }}" alt="media" class="conversation-media-image">
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="conversation-empty chat-empty-state">Почніть діалог з {{ other_user.username }}.</div>
+            {% endfor %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="conversation-form telegram-composer" id="conversationForm">
+            {% csrf_token %}
+
+            <div class="attachment-preview" data-attachment-preview hidden>
+                <span class="attachment-file-name" data-attachment-name></span>
+                <button type="button" class="attachment-clear-btn" data-attachment-clear aria-label="Прибрати файл">×</button>
+            </div>
+
+            <div class="composer-row">
+                <label class="attachment-button" for="id_media_file" title="Прикріпити фото або відео" aria-label="Прикріпити фото або відео">
+                    <span aria-hidden="true">📎</span>
+                </label>
+                <input type="file" name="media_file" id="id_media_file" class="conversation-media-input" accept="image/*,video/*">
+
+                <div class="composer-input-wrap">
+                    <textarea name="text" id="id_text" class="conversation-textarea" placeholder="Напишіть повідомлення..." rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="conversation-send-btn composer-send-btn">Надіслати</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

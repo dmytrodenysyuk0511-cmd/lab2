@@ -1,0 +1,90 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<div class="search-users-page">
+    <div class="search-users-header">
+        <div>
+            <h1>Пошук користувачів</h1>
+            <p>Знайдіть нових друзів для спілкування</p>
+        </div>
+        <a href="{% url 'friends_list' %}" class="back-btn">До друзів</a>
+    </div>
+
+    <div class="search-section">
+        <form method="get" action="{% url 'search_users' %}" class="search-form">
+            <div class="search-input-row">
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ search_query }}"
+                    placeholder="Введіть ім'я користувача або email..."
+                    class="search-input"
+                    autofocus
+                >
+                <button type="submit" class="search-btn">Шукати</button>
+            </div>
+        </form>
+
+        {% if search_query %}
+            <div class="search-results">
+                <h2>Результати пошуку: "{{ search_query }}"</h2>
+
+                {% if search_results %}
+                    <div class="users-list">
+                        {% for user in search_results %}
+                            <div class="user-card">
+                                <div class="user-card-left">
+                                    <a href="{% url 'public_profile' user.username %}" class="user-avatar">
+                                        {% if user.forum_profile.avatar_file %}
+                                            <img src="{{ user.forum_profile.avatar_file.url }}" alt="avatar" class="user-avatar-img">
+                                        {% else %}
+                                            <span class="user-avatar-placeholder">{{ user.username|slice:":1"|upper }}</span>
+                                        {% endif %}
+                                    </a>
+
+                                    <div class="user-info">
+                                        <a href="{% url 'public_profile' user.username %}" class="user-name">
+                                            {{ user.username }}
+                                        </a>
+                                        <div class="user-meta">
+                                            {{ user.email }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="user-actions">
+                                    {% if user.friendship_status == 'accepted' %}
+                                        <a href="{% url 'conversation' user.username %}" class="user-message-btn">Написати</a>
+                                        <span class="user-status-badge user-status-friend">Друзі</span>
+                                    {% elif user.friendship_status == 'pending_sent' %}
+                                        <span class="user-status-badge user-status-pending">Запит відправлено</span>
+                                    {% elif user.friendship_status == 'pending_received' %}
+                                        <span class="user-status-badge user-status-pending">Запит отримано</span>
+                                    {% else %}
+                                        <form method="post" action="{% url 'send_friend_request' user.username %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="user-add-btn">Додати в друзі</button>
+                                        </form>
+                                    {% endif %}
+
+                                    <a href="{% url 'public_profile' user.username %}" class="user-profile-btn">Профіль</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="search-empty-box">
+                        Нічого не знайдено за запитом "{{ search_query }}". Спробуйте інший запит.
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="search-hint-box">
+                <h3>💡 Підказка</h3>
+                <p>Введіть ім'я користувача або email у поле пошуку, щоб знайти нових друзів.</p>
+                <p>Ви можете додавати користувачів у друзі та вести з ними приватні діалоги!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

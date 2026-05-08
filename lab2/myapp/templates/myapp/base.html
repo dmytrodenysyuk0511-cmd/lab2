@@ -1,53 +1,51 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="{{ site_language|default:'uk' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{% static 'myapp/css/style.css' %}">
-    <script src="{% static 'myapp/js/main.js' %}" defer></script>
+    <title>{% block title %}{% if title %}{{ title }}{% else %}UNIChat{% endif %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/style.css' %}?v=20260508-lang">
+    <script src="{% static 'myapp/js/main.js' %}?v=20260508-lang" defer></script>
 </head>
-<body>
-    <header class="top-header">
-        <div class="site-shell top-header-inner">
-            <div class="brand-block">
-                <a href="{% url 'home' %}" class="brand-logo">UNI<span>CHAT</span></a>
-                <div class="brand-subtitle">Форум для тем, обговорень та спілкування</div>
-            </div>
-
-            <div class="header-links">
-                <a href="{% url 'home' %}">Форуми</a>
-                <a href="{% url 'store_home' %}">Магазин</a>
-                <a href="{% url 'cart_view' %}">Кошик ({{ cart_count }})</a>
-                <a href="{% url 'profile' %}">My Profile</a>
-
-                {% if user.is_authenticated %}
-                    <a href="{% url 'create_post' %}">Додати тему</a>
-                    <a href="{% url 'logout' %}">Logout</a>
-                {% else %}
-                    <a href="{% url 'register' %}">Register</a>
-                {% endif %}
-            </div>
-        </div>
-    </header>
+<body class="theme-{{ site_theme|default:'light' }}">
 
     <main class="site-shell main-layout">
-        <aside class="left-sidebar">
-            <nav class="sidebar-menu">
-                <a href="{% url 'home' %}" class="sidebar-link active">Forums</a>
-                <a href="{% url 'store_home' %}" class="sidebar-link">Store</a>
-                <a href="{% url 'cart_view' %}" class="sidebar-link">Cart ({{ cart_count }})</a>
-                <a href="{% url 'home' %}" class="sidebar-link">What's New</a>
-                <a href="{% url 'home' %}" class="sidebar-link">Recent Posts</a>
-                <a href="{% url 'profile' %}" class="sidebar-link">My Profile</a>
+        <aside class="side-panel">
+            <div class="side-menu">
+                <div class="side-menu-label">{{ ui.menu }}</div>
+                <nav class="side-nav" aria-label="Основне меню">
+                    <a href="{% url 'home' %}" class="side-link {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'category_posts' or request.resolver_match.url_name == 'post_detail' %}is-active{% endif %}">
+                        <span>{{ ui.forums }}</span>
+                    </a>
 
-                {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="sidebar-link">Logout</a>
-                {% else %}
-                    <a href="{% url 'register' %}" class="sidebar-link">Register</a>
-                {% endif %}
-            </nav>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'friends_list' %}" class="side-link {% if request.resolver_match.url_name == 'friends_list' or request.resolver_match.url_name == 'search_users' or request.resolver_match.url_name == 'public_profile' %}is-active{% endif %}">
+                            <span>{{ ui.friends }}</span>
+                        </a>
+                        <a href="{% url 'messages_list' %}" class="side-link {% if request.resolver_match.url_name == 'messages_list' or request.resolver_match.url_name == 'conversation' %}is-active{% endif %}">
+                            <span>{{ ui.messages }}</span>
+                        </a>
+                        <a href="{% url 'saved_items' %}" class="side-link {% if request.resolver_match.url_name == 'saved_items' %}is-active{% endif %}">
+                            <span>{{ ui.saved }}</span>
+                            {% if saved_count %}<span class="side-count">{{ saved_count }}</span>{% endif %}
+                        </a>
+                        <a href="{% url 'profile' %}" class="side-link {% if request.resolver_match.url_name == 'profile' %}is-active{% endif %}">
+                            <span>{{ ui.profile }}</span>
+                        </a>
+                        <a href="{% url 'account_settings' %}" class="side-link {% if request.resolver_match.url_name == 'account_settings' or request.resolver_match.url_name == 'password_reset_request_view' or request.resolver_match.url_name == 'password_reset_confirm_view' %}is-active{% endif %}">
+                            <span>{{ ui.settings }}</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login_view' %}" class="side-link {% if request.resolver_match.url_name == 'login_view' %}is-active{% endif %}">
+                            <span>{{ ui.login }}</span>
+                        </a>
+                        <a href="{% url 'register' %}" class="side-link {% if request.resolver_match.url_name == 'register' %}is-active{% endif %}">
+                            <span>{{ ui.register }}</span>
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
         </aside>
 
         <section class="content-area">
@@ -55,11 +53,5 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="site-shell footer-inner">
-            <div>UNIChat Forum</div>
-            <div>Store, cart, newsletter and ratings</div>
-        </div>
-    </footer>
 </body>
 </html>
